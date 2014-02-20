@@ -24,19 +24,10 @@ io.sockets.on('connection', function(socket) {
 
     socket.emit('welcome', { 
         message: 'HELLO FROM REMOTE',
-        address: address.address,
-        basepathremote: config.bpr,
-        filestowatch: config.filestowatch
+        address: address.address
     });
 
-    socket.on('filechange', function(data) {
-        console.log("changed file (as sent from server): " + data.changedfile);
-        var modified_file_location = config.bpr + data.changedfile.substring(config.bpl.length, data.changedfile.length);
-        if (  modified_file_location.match(/\\/)  ) {
-            //path contains a backslash. replace any existing forward slashes with backslashes.
-            modified_file_location = modified_file_location.replace(/\//g, '\\');
-        }
-        console.log("modified_file_location: " + modified_file_location);
-        wf(modified_file_location, data.filecontents);
+    socket.on('squit', function(data) {
+       //nargo
 	});
 });

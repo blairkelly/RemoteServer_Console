@@ -10,13 +10,3 @@ socket_remote.on('welcome', function(data) {
     console.log(data.message);
     console.log('Handshake address: ' + data.address);
 });
-
-var socket = io.connect('//'+serverip+':'+serverport);
-socket.on('welcome', function(data) {
-	console.log("Connected LOCAL");
-    console.log(data.message);
-    console.log('Handshake address: ' + data.address);
-});
-socket.on('filechange', function(data) {
-    socket_remote.emit('filechange', data);
-});
