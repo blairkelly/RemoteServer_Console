@@ -1,4 +1,6 @@
+
 var config = require('./config');
+var request = require('request');
 
 console.log("Listening on port " + config.listenport);
 
@@ -6,7 +8,6 @@ var fs = require('fs');
 var app = require('express')(),           // start Express framework
     server = require('http').createServer(app), // start an HTTP server
     io_local = require('socket.io').listen(server);
-
 
 server.listen(config.listenport);
 
