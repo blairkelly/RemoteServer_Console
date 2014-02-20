@@ -15,7 +15,7 @@ var serialport = require("serialport"),     // include the serialport library
 
 server.listen(config.listenport);
 
-var portName = "/dev/ttyACM0";           // third word of the command line should be serial port name
+var portName = "/dev/ttyAMA0";           // third word of the command line should be serial port name
 // open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
 var myPort = new SerialPort(portName, { 
   baudrate: 57600,
