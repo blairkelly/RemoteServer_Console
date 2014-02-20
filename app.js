@@ -76,9 +76,8 @@ io_local.sockets.on('connection', function(socket) {
       // set the value property of scores to the serial string:
       serialData.value = data;
       // for debugging, you should see this in Terminal:
-      //console.log(data);
-      // send a serial event to the web client with the data:
+      console.log(data);
       socket.emit('serialEvent', serialData);
     });
-    
+
 });
