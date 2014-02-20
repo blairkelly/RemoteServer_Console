@@ -9,3 +9,6 @@ socket_remote.on('welcome', function(data) {
     console.log(data.message);
     console.log('Handshake address: ' + data.address);
 });
+socket_remote.on('serialEvent', function(data) {
+    console.log(data);
+});
