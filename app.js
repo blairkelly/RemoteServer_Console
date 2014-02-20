@@ -6,10 +6,22 @@ console.log("Listening on port " + config.listenport);
 
 var fs = require('fs');
 var app = require('express')(),           // start Express framework
-    server = require('http').createServer(app), // start an HTTP server
-    io_local = require('socket.io').listen(server);
+  server = require('http').createServer(app), // start an HTTP server
+  io_local = require('socket.io').listen(server);
+
+var serialport = require("serialport"),     // include the serialport library
+  SerialPort  = serialport.SerialPort,      // make a local instance of serial
+  serialData = {};                    // object to hold what goes out to the client
 
 server.listen(config.listenport);
+
+var portName = "/dev/ttyACM0";           // third word of the command line should be serial port name
+// open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
+var myPort = new SerialPort(portName, { 
+  baudrate: 57600,
+  // look for return and newline at the end of each data packet:
+  parser: serialport.parsers.readline("\r\n") 
+});
 
 app.get('/', function (request, response) {
   response.sendfile(__dirname + '/index.html');
