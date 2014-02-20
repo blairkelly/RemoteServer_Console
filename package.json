@@ -1,0 +1,25 @@
+{
+  "name": "RemoteServer_Console",
+  "version": "0.0.0",
+  "description": "RemoteServer_Console ====================",
+  "main": "app.js",
+  "dependencies": {
+    "express": "~3.4.8"
+  },
+  "devDependencies": {
+    "express": "~3.4.8"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blairkelly/RemoteServer_Console.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blairkelly/RemoteServer_Console/issues"
+  },
+  "homepage": "https://github.com/blairkelly/RemoteServer_Console"
+}
