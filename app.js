@@ -1,6 +1,5 @@
 
 var config = require('./config');
-var request = require('request');
 
 console.log("Listening on port " + config.listenport);
 
@@ -15,13 +14,25 @@ var serialport = require("serialport"),     // include the serialport library
 
 server.listen(config.listenport);
 
-var portName = "/dev/ttyACM0";           // third word of the command line should be serial port name
-// open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
+var portName = "/dev/tty.usbmodem1411";           // third word of the command line should be serial port name
+
 var myPort = new SerialPort(portName, { 
   baudrate: 57600,
   // look for return and newline at the end of each data packet:
   parser: serialport.parsers.readline("\r\n") 
 });
+myPort.on("open", function () {
+  console.log('Serial Port Opened');
+
+  myPort.on('data', function (data) {
+      serialData.value = data; // set the value property of scores to the serial string:
+      console.log(data);
+      //socket.emit('serialEvent', serialData);
+  });
+
+});
+
+
 
 app.get('/', function (request, response) {
   response.sendfile(__dirname + '/index.html');
@@ -54,12 +65,12 @@ io_local.configure(function(){
 
 
 
-function wf(thefile, filecontents) {
-    fs.writeFile(thefile, filecontents, function () {
-        console.log("Callback: Wrote to file.");
-        io.sockets.emit('saved', true);
-    });
-}
+
+
+
+
+
+
 
 
 // Emit welcome message on connection
@@ -72,12 +83,27 @@ io_local.sockets.on('connection', function(socket) {
         address: address.address
     });
 
-    myPort.on('data', function (data) {
-      // set the value property of scores to the serial string:
-      serialData.value = data;
-      // for debugging, you should see this in Terminal:
-      console.log(data);
-      socket.emit('serialEvent', serialData);
-    });
-
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function wf(thefile, filecontents) {
+    fs.writeFile(thefile, filecontents, function () {
+        console.log("Callback: Wrote to file.");
+        io.sockets.emit('saved', true);
+    });
+}
