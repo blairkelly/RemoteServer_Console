@@ -84,14 +84,16 @@ io_local.sockets.on('connection', function(socket) {
         address: address.address
     });
 
-    socket.on('executecommand', function(thedata) {
-        console.log(thedata);
-        myPort.write("p750\n\r");
+    socket.on('push_power_button', function(time) {
+        myPort.write("p"+time+"\r");
+    });
+    socket.on('report_pwr_led_status', function(bool_switch) {
+        myPort.write("f"+bool_switch+"\r");
     });
 
     myPort.on('data', function (data) {
       serialData.value = data; // set the value property of scores to the serial string:
-      //console.log(data);
+      console.log(data);
       socket.emit('serialEvent', serialData);
   });
 
