@@ -14,7 +14,17 @@ var serialport = require("serialport"),     // include the serialport library
 
 server.listen(config.listenport);
 
+
+serialport.list(function (err, ports) {
+  ports.forEach(function(port) {
+    console.log(port.comName);
+    console.log(port.pnpId);
+    console.log(port.manufacturer);
+  });
+});
+
 var portName = "/dev/tty.usbmodem1411";           // third word of the command line should be serial port name
+
 
 var myPort = new SerialPort(portName, { 
   baudrate: 57600,
