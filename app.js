@@ -23,16 +23,7 @@ var myPort = new SerialPort(portName, {
 });
 myPort.on("open", function () {
   console.log('Serial Port Opened');
-
-  myPort.on('data', function (data) {
-      serialData.value = data; // set the value property of scores to the serial string:
-      console.log(data);
-      //socket.emit('serialEvent', serialData);
-  });
-
 });
-
-
 
 app.get('/', function (request, response) {
   response.sendfile(__dirname + '/index.html');
@@ -82,6 +73,17 @@ io_local.sockets.on('connection', function(socket) {
         message: 'Welcome to Server Console',
         address: address.address
     });
+
+    socket.on('executecommand', function(thedata) {
+        console.log(thedata);
+        myPort.write("p750\n\r");
+    });
+
+    myPort.on('data', function (data) {
+      serialData.value = data; // set the value property of scores to the serial string:
+      //console.log(data);
+      socket.emit('serialEvent', serialData);
+  });
 
 });
 

@@ -12,3 +12,9 @@ socket_remote.on('welcome', function(data) {
 socket_remote.on('serialEvent', function(data) {
     console.log(data);
 });
+
+$(document).ready(function () {
+	$('.executecommand').on('click', function () {
+		socket_remote.emit('executecommand', 'push_power_button');
+	});
+});
