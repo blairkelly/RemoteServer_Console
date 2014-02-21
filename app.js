@@ -24,7 +24,7 @@ serialport.list(function (err, ports) {
 });
 
 //var portName = "/dev/tty.usbmodem1411";           // third word of the command line should be serial port name
-var portName = "/dev/tty.ttyACM0";
+var portName = config.serialport;
 
 var myPort = new SerialPort(portName, { 
   baudrate: 57600,
