@@ -19,7 +19,7 @@ $(document).ready(function () {
 		socket_remote.emit('push_power_button', '850');
 	});
 	$('.turnoffcomputer').on('click', function () {
-		socket_remote.emit('push_power_button', '5200');
+		socket_remote.emit('push_power_button', '5100');
 	});
 	$('.reportpowerledstatus').on('click', function () {
 		socket_remote.emit('report_pwr_led_status', '1');

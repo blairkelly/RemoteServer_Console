@@ -1,5 +1,7 @@
 
-var config = require('./config');
+var config = require('./private_config');
+var http = require('http');
+var ftp_client = require('ftp');
 
 console.log("Listening on port " + config.listenport);
 
@@ -15,6 +17,9 @@ var serialport = require("serialport"),     // include the serialport library
 server.listen(config.listenport);
 
 
+
+//SERIAL PORT STUFF
+/*
 serialport.list(function (err, ports) {
   ports.forEach(function(port) {
     console.log(port.comName);
@@ -22,6 +27,8 @@ serialport.list(function (err, ports) {
     console.log(port.manufacturer);
   });
 });
+*/
+
 
 //var portName = "/dev/tty.usbmodem1411";           // third word of the command line should be serial port name
 var portName = config.serialport;
@@ -34,6 +41,52 @@ var myPort = new SerialPort(portName, {
 myPort.on("open", function () {
   console.log('Serial Port Opened');
 });
+
+
+//ftp
+var upload_sip = function () {
+  console.log("Attempting to upload s_ip.txt");
+  var ftp_c = new ftp_client();
+  ftp_c.on('ready', function() {
+    ftp_c.put('s_ip.txt', 'rsc/s_ip.txt', function(err) {
+     if (err) throw err;
+     ftp_c.end();
+     console.log("Successfully uploaded s_ip.txt");
+    });
+    console.log("READY!");
+  });
+  var ftp_connect_options = {
+    host: config.ftp_address,
+    user: config.ftp_user,
+    password: config.ftp_pass
+  };
+  ftp_c.connect(ftp_connect_options);
+}
+//ip stuff
+var get_ip_options = {
+  host: 'www.blairkelly.ca',
+  port: 80,
+  path: '/rsc/my_ip.php'
+};
+var sip = "ip not set";
+var get_my_ip = function () {
+  http.get(get_ip_options, function(res) {
+    console.log("Server get_ip response: " + res.statusCode);
+    res.on("data", function(chunk) {
+      sip = chunk;
+      wf("s_ip.txt", sip, upload_sip);
+      console.log("IP is " + sip);
+    });
+  }).on('error', function(e) {
+      console.log("get server ip ERROR: " + e.message);
+  });
+}
+var sip = get_my_ip();
+
+
+
+
+
 
 app.get('/', function (request, response) {
   response.sendfile(__dirname + '/index.html');
@@ -115,9 +168,12 @@ io_local.sockets.on('connection', function(socket) {
 
 
 
-function wf(thefile, filecontents) {
+function wf(thefile, filecontents, docallback) {
     fs.writeFile(thefile, filecontents, function () {
-        console.log("Callback: Wrote to file.");
-        io.sockets.emit('saved', true);
+        console.log("Wrote to file.");
+        //io.sockets.emit('saved', true);
+        if(docallback) {
+          docallback();
+        }
     });
 }
