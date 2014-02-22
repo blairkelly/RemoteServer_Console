@@ -40,6 +40,13 @@ var myPort = new SerialPort(portName, {
 });
 myPort.on("open", function () {
   console.log('Serial Port Opened');
+  myPort.on('data', function (data) {
+    if(data.rhb) {
+      console.log("Received a Heartbeat Request...");
+      console.log(data.rhb);
+      get_my_ip();
+    }
+  });
 });
 
 
@@ -81,7 +88,6 @@ var get_my_ip = function () {
       console.log("get server ip ERROR: " + e.message);
   });
 }
-var sip = get_my_ip();
 
 
 
@@ -148,23 +154,11 @@ io_local.sockets.on('connection', function(socket) {
       serialData.value = data; // set the value property of scores to the serial string:
       console.log(data);
       socket.emit('serialEvent', serialData);
-  });
+    });
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      
+      
 
 
 
