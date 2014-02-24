@@ -48,15 +48,16 @@ myPort.on("open", function () {
       params[pieces[0]] = pieces[1];
     }
     
-    io_local.sockets.emit('serialEvent', data);
+    io_local.sockets.emit('serialEvent', params);
 
-    if(params.bootstatus) {
-      console.log("Received Computer Power Status: " + data.bootstatus);
+    if(params.computerpowerstate) {
+      console.log("Received Computer Power State: " + params.computerpowerstate);
+      io_local.sockets.emit('serialEvent', "Computer Power State: " + params.computerpowerstate);
     }
 
     if(params.rhb) {
-      console.log("Received a Heartbeat Request...");
-      console.log(data.rhb);
+      console.log("Received a Heartbeat Request");
+      io_local.sockets.emit('serialEvent', "Heartbeat!");
       myPort.write("h1\r");
       get_my_ip();
     }
