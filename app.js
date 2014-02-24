@@ -39,16 +39,22 @@ myPort.on("open", function () {
   get_my_ip();
   myPort.on('data', function (data) {
     
-    serialData.value = data; // set the value property of scores to the serial string:
-    console.log(data);
-    
-    io_local.sockets.emit('serialEvent', serialData);
+    //serialData.value = data; // set the value property of scores to the serial string:
+    console.log("Serialport received: " + data);
 
-    if(data.bootstatus) {
+    var n = data.value.split("&");
+    var params = {};
+    for(var i = 0; i<n.length; i++) {
+      params[n[i].substring(0, 1)] = n[i].substring(1, n[i].length);
+    }
+    
+    io_local.sockets.emit('serialEvent', data);
+
+    if(params.bootstatus) {
       console.log("Received Computer Power Status: " + data.bootstatus);
     }
 
-    if(data.rhb) {
+    if(params.rhb) {
       console.log("Received a Heartbeat Request...");
       console.log(data.rhb);
       myPort.write("h1\r");
