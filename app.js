@@ -44,7 +44,7 @@ myPort.on("open", function () {
     var pieces = null;
     var params = {};
     for(var i = 0; i<pairs.length; i++) {
-      pieces = pairs[i];
+      pieces = pairs[i].split('=');
       params[pieces[0]] = pieces[1];
     }
     
