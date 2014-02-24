@@ -35,6 +35,7 @@ var myPort = new SerialPort(portName, {
   parser: serialport.parsers.readline("\r\n") 
 });
 myPort.on("open", function () {
+  var message = null;
   console.log('Serial Port Opened');
   get_my_ip();
   myPort.on('data', function (data) {
@@ -51,8 +52,9 @@ myPort.on("open", function () {
     io_local.sockets.emit('serialEvent', params);
 
     if(params.computerpowerstate) {
-      console.log("Received Computer Power State: " + params.computerpowerstate);
-      io_local.sockets.emit('serialEvent', "Computer Power State: " + params.computerpowerstate);
+      message = "Received Computer Power State: " + params.computerpowerstate;
+      console.log(message);
+      io_local.sockets.emit('serialEvent', message);
     }
 
     if(params.rhb) {
