@@ -48,7 +48,13 @@ myPort.on("open", function () {
       message = "Received Computer Power State: " + params.computerpowerstate;
       io_local.sockets.emit('serialEvent', message);
     }
-
+    if(params.actionstatus) {
+      if(params.actionstatus == 'fpbp') {
+        //finished power button push.
+        message = "Finished Power Button Push";
+        io_local.sockets.emit('serialEvent', message);
+      }
+    }
     if(params.rhb) {
       io_local.sockets.emit('serialEvent', "Heartbeat!");
       myPort.write("h1\r");
