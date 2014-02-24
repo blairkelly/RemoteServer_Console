@@ -38,27 +38,24 @@ myPort.on("open", function () {
   console.log('Serial Port Opened');
   get_my_ip();
   myPort.on('data', function (data) {
+    
     serialData.value = data; // set the value property of scores to the serial string:
     console.log(data);
+    
     io_local.sockets.emit('serialEvent', serialData);
 
-        
+    if(data.bootstatus) {
+      console.log("Received Computer Power Status: " + data.bootstatus);
+    }
 
     if(data.rhb) {
       console.log("Received a Heartbeat Request...");
       console.log(data.rhb);
+      myPort.write("h1\r");
       get_my_ip();
     }
     
   });
-
-
-
-  //myPort.on('data', function (data) {
-      
-  //});
-
-
 
 });
 
@@ -163,7 +160,9 @@ io_local.sockets.on('connection', function(socket) {
     socket.on('report_pwr_led_status', function(bool_switch) {
         myPort.write("f"+bool_switch+"\r");
     });
-
+    socket.on('s', function(bool_switch) {
+        myPort.write("s"+bool_switch+"\r");
+    });
 
 });
       
