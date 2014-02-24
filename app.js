@@ -50,6 +50,8 @@ myPort.on("open", function () {
     
     io_local.sockets.emit('serialEvent', data);
 
+    console.log("params T: " + params.t);
+
     if(params.bootstatus) {
       console.log("Received Computer Power Status: " + data.bootstatus);
     }
