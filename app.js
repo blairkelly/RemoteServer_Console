@@ -40,6 +40,8 @@ myPort.on("open", function () {
       //params[key] = key value
     }
 
+    io_local.sockets.emit('serialParams', params);
+
     if(params.bootstatus) {
       message = "Received Arduino Boot Status: " + params.bootstatus;
       io_local.sockets.emit('serialEvent', message);
