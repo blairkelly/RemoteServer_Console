@@ -1,4 +1,4 @@
 node_modules/
 .DS_Store
 private_config.js
-s_ip.txt
+ip.txt

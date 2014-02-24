@@ -3,8 +3,6 @@ var config = require('./private_config');
 var http = require('http');
 var ftp_client = require('ftp');
 
-console.log("Listening on port " + config.listenport);
-
 var fs = require('fs');
 var app = require('express')(),           // start Express framework
   server = require('http').createServer(app), // start an HTTP server
@@ -17,16 +15,6 @@ var serialport = require("serialport"),     // include the serialport library
 server.listen(config.listenport);
 
 //SERIAL PORT STUFF
-/*
-serialport.list(function (err, ports) {
-  ports.forEach(function(port) {
-    console.log(port.comName);
-    console.log(port.pnpId);
-    console.log(port.manufacturer);
-  });
-});
-*/
-
 var portName = config.serialport;
 
 var myPort = new SerialPort(portName, { 
@@ -36,10 +24,8 @@ var myPort = new SerialPort(portName, {
 });
 myPort.on("open", function () {
   var message = null;
-  console.log('Serial Port Opened');
   get_my_ip();
   myPort.on('data', function (data) {
-    console.log("Serialport received: " + data);
 
     var pairs = data.split('&');
     var pieces = null;
@@ -49,11 +35,15 @@ myPort.on("open", function () {
       params[pieces[0]] = pieces[1];
     }
     
-    console.log("PARAMS: ");
     for(key in params) {
-      console.log(key);
+      //log(key) = key name
+      //params[key] = key value
     }
 
+    if(params.bootstatus) {
+      message = "Received Arduino Boot Status: " + params.bootstatus;
+      io_local.sockets.emit('serialEvent', message);
+    }
     if(params.computerpowerstate) {
       message = "Received Computer Power State: " + params.computerpowerstate;
       io_local.sockets.emit('serialEvent', message);
@@ -71,15 +61,13 @@ myPort.on("open", function () {
 
 //ftp
 var upload_sip = function () {
-  console.log("Attempting IP upload...");
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
-    ftp_c.put('s_ip.txt', 'rsc/'+config.ip_filename, function(err) {
+    ftp_c.put('ip.txt', 'rsc/'+config.ip_filename, function(err) {
       if (err) throw err;
       ftp_c.end();
-      console.log("Successfully uploaded " + config.ip_filename);
+      //successfully uploaded ip file to server.
     });
-    console.log("READY!");
   });
   var ftp_connect_options = {
     host: config.ftp_address,
@@ -90,18 +78,16 @@ var upload_sip = function () {
 }
 //ip stuff
 var get_ip_options = {
-  host: 'www.blairkelly.ca',
-  port: 80,
-  path: '/rsc/my_ip.php'
+  host: config.get_ip_host,
+  port: config.get_ip_port,
+  path: config.get_ip_path
 };
 var sip = "ip not set";
 var get_my_ip = function () {
   http.get(get_ip_options, function(res) {
-    console.log("Server get_ip response: " + res.statusCode);
     res.on("data", function(chunk) {
       sip = chunk;
-      wf("s_ip.txt", sip, upload_sip);
-      console.log("IP is " + sip);
+      wf("ip.txt", sip, upload_sip);
     });
   }).on('error', function(e) {
       console.log("get server ip ERROR: " + e.message);
@@ -154,9 +140,10 @@ io_local.configure(function(){
 
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
-
+    var newdate = new Date();
     var address = socket.handshake.address;
-    console.log("Client connected at " + address.address + ":" + address.port);
+
+    console.log("Client: " + address.address + ":" + address.port + " @ " + newdate);
 
     socket.emit('welcome', { 
         message: 'Welcome to Server Console',
@@ -181,8 +168,6 @@ io_local.sockets.on('connection', function(socket) {
 
 function wf(thefile, filecontents, docallback) {
     fs.writeFile(thefile, filecontents, function () {
-        console.log("Wrote to file.");
-        //io.sockets.emit('saved', true);
         if(docallback) {
           docallback();
         }
