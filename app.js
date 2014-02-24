@@ -42,16 +42,15 @@ myPort.on("open", function () {
     //serialData.value = data; // set the value property of scores to the serial string:
     console.log("Serialport received: " + data);
 
-    var n = data.split("&");
     var pairs = data.split('&');
+    var pieces = null;
     var params = {};
-    for(var i = 0; i<n.length; i++) {
-      params[n[i].substring(0, 1)] = n[i].substring(1, n[i].length);
+    for(var i = 0; i<pairs.length; i++) {
+      pieces = pairs[i];
+      params[pieces[0]] = pieces[1];
     }
     
     io_local.sockets.emit('serialEvent', data);
-
-    console.log("Pairs: " + pairs);
 
     if(params.bootstatus) {
       console.log("Received Computer Power Status: " + data.bootstatus);
