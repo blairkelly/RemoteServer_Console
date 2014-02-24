@@ -36,6 +36,7 @@ var myPort = new SerialPort(portName, {
 });
 myPort.on("open", function () {
   console.log('Serial Port Opened');
+  get_my_ip();
   myPort.on('data', function (data) {
     if(data.rhb) {
       console.log("Received a Heartbeat Request...");
