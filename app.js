@@ -61,12 +61,13 @@ myPort.on("open", function () {
 
 //ftp
 var upload_sip = function () {
+  var newdate = new Date();
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
     ftp_c.put('ip.txt', 'rsc/'+config.ip_filename, function(err) {
       if (err) throw err;
       ftp_c.end();
-      //successfully uploaded ip file to server.
+      console.log("Updated IP file on Server @ " + newdate);
     });
   });
   var ftp_connect_options = {
