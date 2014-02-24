@@ -43,6 +43,7 @@ myPort.on("open", function () {
     console.log("Serialport received: " + data);
 
     var n = data.split("&");
+    var pairs = data.split('&');
     var params = {};
     for(var i = 0; i<n.length; i++) {
       params[n[i].substring(0, 1)] = n[i].substring(1, n[i].length);
@@ -50,7 +51,7 @@ myPort.on("open", function () {
     
     io_local.sockets.emit('serialEvent', data);
 
-    console.log("params T: " + params.t);
+    console.log("Pairs: " + pairs);
 
     if(params.bootstatus) {
       console.log("Received Computer Power Status: " + data.bootstatus);
