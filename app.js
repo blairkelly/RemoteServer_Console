@@ -136,6 +136,7 @@ io_local.configure(function(){
 io_local.sockets.on('connection', function(socket) {
 
     var tring = io_local.connected();
+    console.log("tring 2 = " + tring);
 
     var address = socket.handshake.address;
     console.log("Client connected at " + address.address + ":" + address.port);
