@@ -16,8 +16,6 @@ var serialport = require("serialport"),     // include the serialport library
 
 server.listen(config.listenport);
 
-
-
 //SERIAL PORT STUFF
 /*
 serialport.list(function (err, ports) {
@@ -29,8 +27,6 @@ serialport.list(function (err, ports) {
 });
 */
 
-
-//var portName = "/dev/tty.usbmodem1411";           // third word of the command line should be serial port name
 var portName = config.serialport;
 
 var myPort = new SerialPort(portName, { 
@@ -52,13 +48,13 @@ myPort.on("open", function () {
 
 //ftp
 var upload_sip = function () {
-  console.log("Attempting to upload s_ip.txt");
+  console.log("Attempting IP upload...");
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
-    ftp_c.put('s_ip.txt', 'rsc/s_ip.txt', function(err) {
+    ftp_c.put('s_ip.txt', 'rsc/'+config.ip_filename, function(err) {
      if (err) throw err;
      ftp_c.end();
-     console.log("Successfully uploaded s_ip.txt");
+     console.log("Successfully uploaded " + config.ip_filename);
     });
     console.log("READY!");
   });
