@@ -49,16 +49,15 @@ myPort.on("open", function () {
       params[pieces[0]] = pieces[1];
     }
     
-    io_local.sockets.emit('serialEvent', params);
+    //io_local.sockets.emit('serialEvent', params);
+    console.log("PARAMS: " + params);
 
     if(params.computerpowerstate) {
       message = "Received Computer Power State: " + params.computerpowerstate;
-      console.log(message);
       io_local.sockets.emit('serialEvent', message);
     }
 
     if(params.rhb) {
-      console.log("Received a Heartbeat Request");
       io_local.sockets.emit('serialEvent', "Heartbeat!");
       myPort.write("h1\r");
       get_my_ip();
