@@ -38,8 +38,6 @@ myPort.on("open", function () {
   console.log('Serial Port Opened');
   get_my_ip();
   myPort.on('data', function (data) {
-    
-    //serialData.value = data; // set the value property of scores to the serial string:
     console.log("Serialport received: " + data);
 
     var pairs = data.split('&');
@@ -62,7 +60,6 @@ myPort.on("open", function () {
       myPort.write("h1\r");
       get_my_ip();
     }
-    
   });
 
 });
