@@ -37,15 +37,29 @@ var myPort = new SerialPort(portName, {
 myPort.on("open", function () {
   console.log('Serial Port Opened');
   get_my_ip();
-  //myPort.on('data', function (data) {
-    /*
+  myPort.on('data', function (data) {
+    serialData.value = data; // set the value property of scores to the serial string:
+    console.log(data);
+    io_local.sockets.emit('serialEvent', serialData);
+
+        
+
     if(data.rhb) {
       console.log("Received a Heartbeat Request...");
       console.log(data.rhb);
       get_my_ip();
     }
-    */
+    
+  });
+
+
+
+  //myPort.on('data', function (data) {
+      
   //});
+
+
+
 });
 
 
@@ -135,9 +149,6 @@ io_local.configure(function(){
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
 
-    var tring = io_local.connected();
-    console.log("tring 2 = " + tring);
-
     var address = socket.handshake.address;
     console.log("Client connected at " + address.address + ":" + address.port);
 
@@ -153,11 +164,6 @@ io_local.sockets.on('connection', function(socket) {
         myPort.write("f"+bool_switch+"\r");
     });
 
-    myPort.on('data', function (data) {
-      serialData.value = data; // set the value property of scores to the serial string:
-      console.log(data);
-      socket.emit('serialEvent', serialData);
-    });
 
 });
       
