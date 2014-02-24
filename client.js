@@ -11,7 +11,7 @@ socket_remote.on('welcome', function(data) {
 });
 socket_remote.on('serialEvent', function(data) {
     console.log(data);
-    $('.serialdata').prepend(data.value + "<br/>");
+    $('.serialdata').prepend(data + "<br/>");
 });
 
 $(document).ready(function () {
