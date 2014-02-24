@@ -42,7 +42,7 @@ myPort.on("open", function () {
     //serialData.value = data; // set the value property of scores to the serial string:
     console.log("Serialport received: " + data);
 
-    var n = data.value.split("&");
+    var n = data.split("&");
     var params = {};
     for(var i = 0; i<n.length; i++) {
       params[n[i].substring(0, 1)] = n[i].substring(1, n[i].length);
