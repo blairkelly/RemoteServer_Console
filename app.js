@@ -37,13 +37,15 @@ var myPort = new SerialPort(portName, {
 myPort.on("open", function () {
   console.log('Serial Port Opened');
   get_my_ip();
-  myPort.on('data', function (data) {
+  //myPort.on('data', function (data) {
+    /*
     if(data.rhb) {
       console.log("Received a Heartbeat Request...");
       console.log(data.rhb);
       get_my_ip();
     }
-  });
+    */
+  //});
 });
 
 
@@ -53,9 +55,9 @@ var upload_sip = function () {
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
     ftp_c.put('s_ip.txt', 'rsc/'+config.ip_filename, function(err) {
-     if (err) throw err;
-     ftp_c.end();
-     console.log("Successfully uploaded " + config.ip_filename);
+      if (err) throw err;
+      ftp_c.end();
+      console.log("Successfully uploaded " + config.ip_filename);
     });
     console.log("READY!");
   });
@@ -132,6 +134,9 @@ io_local.configure(function(){
 
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
+
+    var tring = io_local.connected();
+
     var address = socket.handshake.address;
     console.log("Client connected at " + address.address + ":" + address.port);
 

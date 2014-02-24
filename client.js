@@ -16,7 +16,7 @@ socket_remote.on('serialEvent', function(data) {
 
 $(document).ready(function () {
 	$('.pushpowerbutton').on('click', function () {
-		socket_remote.emit('push_power_button', '850');
+		socket_remote.emit('push_power_button', '950');
 	});
 	$('.turnoffcomputer').on('click', function () {
 		socket_remote.emit('push_power_button', '5100');
@@ -26,5 +26,8 @@ $(document).ready(function () {
 	});
 	$('.dontreportpowerledstatus').on('click', function () {
 		socket_remote.emit('report_pwr_led_status', '0');
+	});
+	$('.computerpowerstatus').on('click', function () {
+		socket_remote.emit('s', '1');
 	});
 });
