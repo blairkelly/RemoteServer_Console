@@ -49,8 +49,10 @@ myPort.on("open", function () {
       params[pieces[0]] = pieces[1];
     }
     
-    //io_local.sockets.emit('serialEvent', params);
-    console.log("PARAMS: " + params);
+    console.log("PARAMS: ");
+    for(key in params) {
+      console.log(key);
+    }
 
     if(params.computerpowerstate) {
       message = "Received Computer Power State: " + params.computerpowerstate;
