@@ -13,7 +13,13 @@ socket_remote.on('serialEvent', function(data) {
     console.log(data);
     $('.serialdata').prepend(data + "<br/>");
 });
-
+socket_remote.on('serialParams', function(data) {
+	$('.serialParams').html(''); //clear it
+	for(key in data) {
+		var spit = key + ": " + data(key);
+		$('.serialParams').append(spit);
+	}
+});
 $(document).ready(function () {
 	$('.pushpowerbutton').on('click', function () {
 		socket_remote.emit('push_power_button', '950');
