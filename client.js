@@ -16,7 +16,7 @@ socket_remote.on('serialEvent', function(data) {
 socket_remote.on('serialParams', function(data) {
 	$('.serialParams').html(''); //clear it
 	for(key in data) {
-		var spit = key + ": " + data[key];
+		var spit = "<span class='key'>" + key + "</span>: " + data[key] + "<br/>";
 		$('.serialParams').append(spit);
 	}
 });
