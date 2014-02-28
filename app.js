@@ -49,6 +49,9 @@ if(!config.remoteserial) {
         sendserialcommand("h1");
         get_my_ip();
       }
+      if(params.computerpowerstate) {
+        wf("status_computerpowerstate.txt", params.computerpowerstate);
+      }
     });
   });
 }
