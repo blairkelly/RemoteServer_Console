@@ -17,54 +17,67 @@ server.listen(config.listenport);
 //SERIAL PORT STUFF
 var portName = config.serialport;
 
-var myPort = new SerialPort(portName, { 
-  baudrate: 57600,
-  // look for return and newline at the end of each data packet:
-  parser: serialport.parsers.readline("\r\n") 
-});
-myPort.on("open", function () {
-  var message = null;
-  get_my_ip();
-  myPort.on('data', function (data) {
+if(!config.remoteserial) {
+  var myPort = new SerialPort(portName, { 
+    baudrate: 57600,
+    // look for return and newline at the end of each data packet:
+    parser: serialport.parsers.readline("\r\n") 
+  });
+  myPort.on("open", function () {
+    var message = null;
+    get_my_ip();
+    myPort.on('data', function (data) {
 
-    var pairs = data.split('&');
-    var pieces = null;
-    var params = {};
-    for(var i = 0; i<pairs.length; i++) {
-      pieces = pairs[i].split('=');
-      params[pieces[0]] = pieces[1];
-    }
-    
-    for(key in params) {
-      //log(key) = key name
-      //params[key] = key value
-    }
+      var pairs = data.split('&');
+      var pieces = null;
+      var params = {};
+      for(var i = 0; i<pairs.length; i++) {
+        pieces = pairs[i].split('=');
+        params[pieces[0]] = pieces[1];
+      }
+      
+      for(key in params) {
+        //log(key) = key name
+        //params[key] = key value
+      }
 
-    io_local.sockets.emit('serialParams', params);
+      io_local.sockets.emit('serialParams', params);
 
-    if(params.bootstatus) {
-      message = "Received Arduino Boot Status: " + params.bootstatus;
-      io_local.sockets.emit('serialEvent', message);
-    }
-    if(params.computerpowerstate) {
-      message = "Received Computer Power State: " + params.computerpowerstate;
-      io_local.sockets.emit('serialEvent', message);
-    }
-    if(params.actionstatus) {
-      if(params.actionstatus == 'fpbp') {
-        //finished power button push.
-        message = "Finished Power Button Push";
+      /*
+      if(params.bootstatus) {
+        message = "Received Arduino Boot Status: " + params.bootstatus;
         io_local.sockets.emit('serialEvent', message);
       }
-    }
-    if(params.rhb) {
-      io_local.sockets.emit('serialEvent', "Heartbeat!");
-      myPort.write("h1\r");
-      get_my_ip();
-    }
-  });
+      if(params.computerpowerstate) {
+        message = "Received Computer Power State: " + params.computerpowerstate;
+        io_local.sockets.emit('serialEvent', message);
+      }
+      if(params.actionstatus) {
+        if(params.actionstatus == 'fpbp') {
+          //finished power button push.
+          message = "Finished Power Button Push";
+          io_local.sockets.emit('serialEvent', message);
+        }
+      }
+      if(params.rhb) {
+        io_local.sockets.emit('serialEvent', "Heartbeat!");
+        myPort.write("h1\r");
+        get_my_ip();
+      }
+      */
+      
+    });
 
-});
+  });
+}
+
+var sendserialcommand = function (command) {
+  if(config.remoteserial) {
+    console.log('remote serial command: ' + command);
+  } else {
+    myPort.write(command+"\r");
+  }
+}
 
 
 //ftp
@@ -160,13 +173,13 @@ io_local.sockets.on('connection', function(socket) {
     });
 
     socket.on('push_power_button', function(time) {
-        myPort.write("p"+time+"\r");
+        sendserialcommand("p"+time);
     });
     socket.on('report_pwr_led_status', function(bool_switch) {
-        myPort.write("f"+bool_switch+"\r");
+        sendserialcommand("f"+bool_switch);
     });
     socket.on('s', function(bool_switch) {
-        myPort.write("s"+bool_switch+"\r");
+        sendserialcommand("s"+bool_switch);
     });
 
 });
