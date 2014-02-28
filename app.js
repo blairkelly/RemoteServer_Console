@@ -144,11 +144,22 @@ function wf(thefile, filecontents, docallback) {
 
 app.get('/', function (request, response) {
   if(config.remoteserial) {
-    response.sendfile(__dirname + '/index.html');
+      var get_status_options = {
+        host: config.remote_serial_ip,
+        port: config.listenport,
+        path: "/status_computerpowerstate.txt"
+      };
+      http.get(get_status_options, function(res) {
+          res.on("data", function(chunk) {
+            console.log("SUCCESS, RETRIEVED STATUS: " + chunk);
+            response.sendfile(__dirname + '/index.html');
+          });
+      }).on('error', function(e) {
+          console.log("get server ip ERROR: " + e.message);
+      });
   } else {
-    response.sendfile(__dirname + '/index.html');
+      response.sendfile(__dirname + '/index.html');
   }
-  
 });
 app.get('/client_config.js', function (request, response) {
   response.sendfile(__dirname + '/client_config.js');
