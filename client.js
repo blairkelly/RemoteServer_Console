@@ -1,11 +1,35 @@
+/*
+    Ref:
+
+    params.bootstatus = Received Arduino Boot Status
+    params.computerpowerstate = Received Computer Power State
+    params.actionstatus
+        params.actionstatus == 'fpbp' = Finished Power Button Push
+    params.rhb= Heartbeat!
+*/
+
+
 var app_socket = io.connect('//'+serverip+':'+serverport);
+var serial_socket = app_socket;
 
 app_socket.on('welcome', function(data) {
     console.log(data.message);
     console.log('Handshake address: ' + data.address);
 });
 
-app_socket.on('serialParams', function(data) {
+
+//if I just need to issue commands and receive data from a remote serial (i.e. for use during development)
+//this might not even be necessary, I'm not sure yet. (still a noob)
+if(remote_serial_ip) {
+    var remoteserial_socket = io.connect('//'+remote_serial_ip+':'+remote_serial_port);
+    serial_socket = remoteserial_socket;
+    remoteserial_socket.on('welcome', function(data) {
+        console.log("CONNECTED TO REMOTE SERIAL PORT");
+    });
+}
+
+
+serial_socket.on('serialParams', function(data) {
 	$('.serialParams').html(''); //clear it
 	for(key in data) {
 		var spit = "<span class='key'>" + key + "</span>: " + data[key] + "<br/>";
@@ -13,13 +37,14 @@ app_socket.on('serialParams', function(data) {
 	}
 });
 
+
 var serialcmd = function(command) {
-	app_socket.emit('serialCommand', command);
+	serial_socket.emit('serialCommand', command);
 }
 
 $(document).ready(function () {
 	$('.pushpowerbutton').on('click', function () {
-		serialcmd('p950');
+		serialcmd('p760');
 	});
 	$('.turnoffcomputer').on('click', function () {
 		serialcmd('p5100');
@@ -28,52 +53,3 @@ $(document).ready(function () {
 		serialcmd('s1');
 	});
 });
-
-
-	/*
-
-	APP.js
-
-	socket.on('push_power_button', function(time) {
-        sendserialcommand("p"+time);
-    });
-    socket.on('report_pwr_led_status', function(bool_switch) {
-        sendserialcommand("f"+bool_switch);
-    });
-    socket.on('s', function(bool_switch) {
-        sendserialcommand("s"+bool_switch);
-    });
-
-	*/
-
-
-
-	/*
-
-	CLIENT js
-
-    if(params.bootstatus) {
-        message = "Received Arduino Boot Status: " + params.bootstatus;
-        io_local.sockets.emit('serialEvent', message);
-    }
-
-    if(params.computerpowerstate) {
-        message = "Received Computer Power State: " + params.computerpowerstate;
-        io_local.sockets.emit('serialEvent', message);
-    }
-
-    if(params.actionstatus) {
-        if(params.actionstatus == 'fpbp') {
-          //finished power button push.
-          message = "Finished Power Button Push";
-          io_local.sockets.emit('serialEvent', message);
-        }
-    }
-
-    if(params.rhb) {
-        io_local.sockets.emit('serialEvent', "Heartbeat!");
-        myPort.write("h1\r");
-        get_my_ip();
-    }
-
-    */

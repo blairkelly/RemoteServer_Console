@@ -20,6 +20,7 @@ var sendserialcommand = function (instruction) {
   var thecommand = instruction + "\r";
   if(config.remoteserial) {
     //do nothing
+    console.log("sent to remote serial: " + thecommand);
   } else {
     console.log(thecommand);
     myPort.write(thecommand);
