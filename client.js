@@ -20,7 +20,9 @@ app_socket.on('welcome', function(data) {
 
 //if I just need to issue commands and receive data from a remote serial (i.e. for use during development)
 //this might not even be necessary, I'm not sure yet. (still a noob)
-if(typeof(remote_serial_ip)) {
+if( typeof remote_serial_ip === 'undefined' ) {
+    console.log("remote serial ip is undefined");
+} else {
     var remoteserial_socket = io.connect('//'+remote_serial_ip+':'+remote_serial_port);
     serial_socket = remoteserial_socket;
     remoteserial_socket.on('welcome', function(data) {
