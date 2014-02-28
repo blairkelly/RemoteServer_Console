@@ -143,7 +143,12 @@ function wf(thefile, filecontents, docallback) {
 
 
 app.get('/', function (request, response) {
-  response.sendfile(__dirname + '/index.html');
+  if(config.remoteserial) {
+    response.sendfile(__dirname + '/index.html');
+  } else {
+    response.sendfile(__dirname + '/index.html');
+  }
+  
 });
 app.get('/client_config.js', function (request, response) {
   response.sendfile(__dirname + '/client_config.js');
@@ -166,7 +171,9 @@ app.get('/jquery/jquery-2.0.3.min.map', function (request, response) {
 app.get('/bootstrap/js/bootstrap.min.js', function (request, response) {
   response.sendfile(__dirname + '/bootstrap/js/bootstrap.min.js');
 });
-
+app.get('/status_computerpowerstate.txt', function (request, response) {
+  response.sendfile(__dirname + '/status_computerpowerstate.txt');
+});
 
 
 io_local.configure(function(){
