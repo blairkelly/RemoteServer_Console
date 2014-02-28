@@ -16,11 +16,13 @@ server.listen(config.listenport);
 
 //SERIAL PORT STUFF
 var portName = config.serialport;
-var sendserialcommand = function (command) {
+var sendserialcommand = function (instruction) {
+  var thecommand = instruction + "\r";
   if(config.remoteserial) {
     //do nothing
   } else {
-    myPort.write(command+"\r");
+    console.log(thecommand);
+    myPort.write(thecommand);
   }
 }
 if(!config.remoteserial) {
