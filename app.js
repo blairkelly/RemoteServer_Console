@@ -180,9 +180,6 @@ app.get('/client_config.js', function (request, response) {
 app.get('/client.js', function (request, response) {
   response.sendfile(__dirname + '/client.js');
 });
-app.get('/bootstrap/css/bootstrap.min.css', function (request, response) {
-  response.sendfile(__dirname + '/bootstrap/css/bootstrap.min.css');
-});
 app.get('/style.css', function (request, response) {
   response.sendfile(__dirname + '/style.css');
 });
@@ -191,9 +188,6 @@ app.get('/jquery/jquery-2.0.3.min.js', function (request, response) {
 });
 app.get('/jquery/jquery-2.0.3.min.map', function (request, response) {
   response.sendfile(__dirname + '/jquery/jquery-2.0.3.min.map');
-});
-app.get('/bootstrap/js/bootstrap.min.js', function (request, response) {
-  response.sendfile(__dirname + '/bootstrap/js/bootstrap.min.js');
 });
 app.get('/status_computerpowerstate.txt', function (request, response) {
   response.sendfile(__dirname + '/status_computerpowerstate.txt');
