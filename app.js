@@ -8,11 +8,14 @@ var app = require('express')(),           // start Express framework
   server = require('http').createServer(app), // start an HTTP server
   io_local = require('socket.io').listen(server);
 
+var jade = require('jade');
+
 var serialport = require("serialport"),     // include the serialport library
   SerialPort  = serialport.SerialPort,      // make a local instance of serial
   serialData = {};                    // object to hold what goes out to the client
 
 server.listen(config.listenport);
+
 
 //SERIAL PORT STUFF
 var portName = config.serialport;
@@ -143,6 +146,16 @@ function wf(thefile, filecontents, docallback) {
 
 
 app.get('/', function (request, response) {
+  var respond = function () {
+    //html = jade.renderFile('index.jade', function(){console.log("FINISHED")});
+    jade.renderFile('index.jade', function (err, html) {
+      if (err) throw err;
+      //console.log(html);
+      response.send(html);
+    });
+    //response.send(html);
+    //response.sendfile(__dirname + '/index.html');
+  }
   if(config.remoteserial) {
       var get_status_options = {
         host: config.remote_serial_ip,
@@ -152,13 +165,13 @@ app.get('/', function (request, response) {
       http.get(get_status_options, function(res) {
           res.on("data", function(chunk) {
             console.log("SUCCESS, RETRIEVED STATUS: " + chunk);
-            response.sendfile(__dirname + '/index.html');
+            respond();
           });
       }).on('error', function(e) {
           console.log("get server ip ERROR: " + e.message);
       });
   } else {
-      response.sendfile(__dirname + '/index.html');
+    respond();    
   }
 });
 app.get('/client_config.js', function (request, response) {
