@@ -70,10 +70,7 @@ if(!config.remoteserial) {
       if(params.computerpowerstate) {
         wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
       }
-      setTimeout(function () {
-        //get essential data
-        sendserialcommand("s1");
-      }, 220);
+      console.log('opened port');
     });
   });
 }
