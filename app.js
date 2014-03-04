@@ -80,6 +80,15 @@ if(!config.remoteserial) {
 }
 
 
+//ip string cleanup
+var clean_ip_string = function (this_ip) {
+  //var ip_regex_pattern = "/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).‌​(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.t‌​est('10.10.10.10')";
+  //var cleaned_ip = String(this_ip).match(ip_regex_pattern);  //why isn't this working?
+  var cleaned_ip = String(this_ip);
+  console.log('cleaned ip: ' + cleaned_ip);
+  return cleaned_ip;
+}
+
 //ftp
 var upload_sip = function () {
   var newdate = new Date();
@@ -113,14 +122,11 @@ var sip = "ip not set";
 var get_my_ip = function () {
   http.get(get_recorded_ip_options, function(res) {
     res.on("data", function(chunk) {
-      var recorded_ip = chunk;
-      console.log("recorded ip: " + recorded_ip);
+      var recorded_ip = clean_ip_string(chunk);
       http.get(get_ip_options, function(res) {
         res.on("data", function(chunk) {
-          sip = chunk;
+          sip = clean_ip_string(chunk);
           if(recorded_ip != sip) {
-            console.log('rip: |' + recorded_ip + '|');
-            console.log('sip: |' + sip + '|');
             console.log("ips do not match. uploading new.");
             wf("public/compiled/ip.txt", sip, upload_sip);
           } else {
@@ -162,7 +168,7 @@ function wf(thefile, filecontents, docallback) {
 }
 
 
-
+get_my_ip();
 
 
 
