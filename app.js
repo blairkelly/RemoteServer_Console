@@ -119,6 +119,8 @@ var get_my_ip = function () {
         res.on("data", function(chunk) {
           sip = chunk;
           if(recorded_ip != sip) {
+            console.log('rip: ' + recorded_ip);
+            console.log('sip: ' + sip);
             console.log("ips do not match. uploading new.");
             wf("public/compiled/ip.txt", sip, upload_sip);
           } else {
