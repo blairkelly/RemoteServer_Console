@@ -9,6 +9,8 @@ var app = require('express')(),           // start Express framework
   io_local = require('socket.io').listen(server);
 
 var jade = require('jade');
+var sass = require('node-sass');
+var css_last_modified = '';
 
 var serialport = require("serialport"),     // include the serialport library
   SerialPort  = serialport.SerialPort,      // make a local instance of serial
@@ -132,29 +134,26 @@ function wf(thefile, filecontents, docallback) {
 
 
 
-
-
-
-
-
-
-
-
-
+function compile_css(css_file, docallback) {
+  sass.render({
+    file: css_file,
+    success: function(css) {
+      if(docallback) {
+        docallback(css);
+      }
+    }
+  });
+}
 
 
 
 
 app.get('/', function (request, response) {
-  var respond = function () {
-    //html = jade.renderFile('index.jade', function(){console.log("FINISHED")});
+  var respond = function (css) {
     jade.renderFile('index.jade', function (err, html) {
       if (err) throw err;
-      //console.log(html);
       response.send(html);
     });
-    //response.send(html);
-    //response.sendfile(__dirname + '/index.html');
   }
   if(config.remoteserial) {
       var get_status_options = {
@@ -181,7 +180,22 @@ app.get('/client.js', function (request, response) {
   response.sendfile(__dirname + '/client.js');
 });
 app.get('/style.css', function (request, response) {
-  response.sendfile(__dirname + '/style.css');
+  fs.stat('style.scss', function (err, stats) {
+    if(css_last_modified != stats.mtime) {
+      //times don't match. recompile.
+      console.log("Recompiling CSS...");
+      css_last_modified = stats.mtime;
+      compile_css('style.scss', function (css) {
+        wf("compiled.css", css, function () {
+          console.log("Finished CSS Compile");
+          response.sendfile(__dirname + '/compiled.css');
+        });
+      });
+    } else {
+      response.sendfile(__dirname + '/compiled.css');
+    }
+  });
+  
 });
 app.get('/jquery/jquery-2.0.3.min.js', function (request, response) {
   response.sendfile(__dirname + '/jquery/jquery-2.0.3.min.js');
