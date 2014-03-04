@@ -12,6 +12,10 @@ var jade = require('jade');
 var sass = require('node-sass');
 var css_last_modified = '';
 
+var view_data = {
+  cps: "off"
+}
+
 var serialport = require("serialport"),     // include the serialport library
   SerialPort  = serialport.SerialPort,      // make a local instance of serial
   serialData = {};                    // object to hold what goes out to the client
@@ -57,6 +61,10 @@ if(!config.remoteserial) {
       if(params.computerpowerstate) {
         wf("status_computerpowerstate.txt", params.computerpowerstate);
       }
+      setTimeout(function () {
+        //get essential data
+        sendserialcommand("s1");
+      }, 220);
     });
   });
 }
@@ -149,12 +157,13 @@ function compile_css(css_file, docallback) {
 
 
 app.get('/', function (request, response) {
-  var respond = function (css) {
-    jade.renderFile('index.jade', function (err, html) {
+  var respond = function () {
+    jade.renderFile('index.jade', {viewdata: view_data}, function (err, html) {
       if (err) throw err;
       response.send(html);
     });
   }
+
   if(config.remoteserial) {
       var get_status_options = {
         host: config.remote_serial_ip,
@@ -164,6 +173,7 @@ app.get('/', function (request, response) {
       http.get(get_status_options, function(res) {
           res.on("data", function(chunk) {
             console.log("SUCCESS, RETRIEVED STATUS: " + chunk);
+            view_data.cps = chunk;
             respond();
           });
       }).on('error', function(e) {

@@ -1,3 +1,16 @@
 body {
-	background: #fff;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 20px;
+	&.on {
+		background: white;
+		color: darkgrey;
+	}
+	&.sleeping {
+		background: #020221;
+		color: white;
+	}
+	&.off {
+		background: black;
+		color: white;
+	}
 }
