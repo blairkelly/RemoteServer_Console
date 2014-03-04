@@ -80,13 +80,12 @@ if(!config.remoteserial) {
 }
 
 
-
 //ftp
 var upload_sip = function () {
   var newdate = new Date();
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
-    ftp_c.put('/public/compiled/ip.txt', config.ip_filename, function(err) {
+    ftp_c.put('public/compiled/ip.txt', config.ip_filename, function(err) {
       if (err) throw err;
       ftp_c.end();
       console.log("Updated IP file on Server @ " + newdate);
@@ -115,12 +114,13 @@ var get_my_ip = function () {
   http.get(get_recorded_ip_options, function(res) {
     res.on("data", function(chunk) {
       var recorded_ip = chunk;
+      console.log("recorded ip: " + recorded_ip);
       http.get(get_ip_options, function(res) {
         res.on("data", function(chunk) {
           sip = chunk;
           if(recorded_ip != sip) {
             console.log("ips do not match. uploading new.");
-            wf("/public/compiled/ip.txt", sip, upload_sip);
+            wf("public/compiled/ip.txt", sip, upload_sip);
           } else {
             console.log('IPs match. Will not perform upload.');
           }
@@ -152,7 +152,7 @@ io_local.sockets.on('connection', function(socket) {
 
 
 
-
+get_my_ip();
 
 
 
