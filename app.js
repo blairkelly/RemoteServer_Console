@@ -70,8 +70,10 @@ if(!config.remoteserial) {
       if(params.computerpowerstate) {
         wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
       }
-      console.log('opened serial port');
     });
+    //get a status code.
+    sendserialcommand("s1");
+    console.log('opened serial port');
   });
 }
 
@@ -166,9 +168,6 @@ function compile_css(css_file, docallback) {
 
 
 app.get('/', function (request, response) {
-  //get a status code.
-  sendserialcommand("s1");
-
   var respond = function () {
     jade.renderFile(__dirname + '/public/views/index.jade', {viewdata: view_data}, function (err, html) {
       if (err) throw err;
