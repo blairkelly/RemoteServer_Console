@@ -7,12 +7,19 @@ body {
 		color: darkgrey;
 	}
 	&.sleeping {
-		background: #020221;
+		background: url(/images/stars.jpg) center top no-repeat;
+		background-size: cover;
 		color: white;
 	}
 	&.off {
 		background: black;
 		color: white;
+	}
+	.container {
+		background: #fff;
+		width: 850px;
+		opacity: 0.667;
+
 	}
 }
 

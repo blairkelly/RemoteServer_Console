@@ -68,7 +68,7 @@ if(!config.remoteserial) {
         get_my_ip();
       }
       if(params.computerpowerstate) {
-        wf("status_computerpowerstate.txt", params.computerpowerstate);
+        wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
       }
       setTimeout(function () {
         //get essential data
@@ -167,7 +167,7 @@ function compile_css(css_file, docallback) {
 
 app.get('/', function (request, response) {
   var respond = function () {
-    jade.renderFile('index.jade', {viewdata: view_data}, function (err, html) {
+    jade.renderFile(__dirname + '/public/views/index.jade', {viewdata: view_data}, function (err, html) {
       if (err) throw err;
       response.send(html);
     });
@@ -177,12 +177,16 @@ app.get('/', function (request, response) {
       var get_status_options = {
         host: config.remote_serial_ip,
         port: config.listenport,
-        path: "/status_computerpowerstate.txt"
+        path: "/public/compiled/status_computerpowerstate.txt"
       };
       http.get(get_status_options, function(res) {
           res.on("data", function(chunk) {
-            console.log("SUCCESS, RETRIEVED STATUS: " + chunk);
-            view_data.cps = chunk;
+            console.log("statusCode is " + res.statusCode + " ... received: " + chunk);
+            if(res.statusCode == 200) {
+              view_data.cps = chunk;
+            } else {
+              view_data.cps = "off";
+            }
             respond();
           });
       }).on('error', function(e) {
@@ -192,22 +196,18 @@ app.get('/', function (request, response) {
     respond();    
   }
 });
-app.get('/client_config.js', function (request, response) {
-  response.sendfile(__dirname + '/client_config.js');
-});
-app.get('/client.js', function (request, response) {
-  console.log(request.param('name') + ' was requested.');
-  response.sendfile(__dirname + '/client.js');
-});
-app.get('/style.css', function (request, response) {
+
+app.get('/styles/style.css', function (request, response) {
   console.log(' ');
-  var cssinfofile = 'info_file_csslastmodified.txt';
+  var cssinfofile = __dirname + '/public/compiled/info_file_csslastmodified.txt';
+  var css_scss_file_path = __dirname + '/public/styles/style.scss';
+  var compiled_css_path = __dirname + '/public/compiled/compiled.css';
   var getstatswritemtime = function() {
     fs.readFile(cssinfofile, function(err, data) {
       var oldmtime_raw = new Date(data);
       var oldmtime = oldmtime_raw.getTime();
       console.log('oldmtime: ' + oldmtime);
-      fs.stat('style.scss', function (err, stats) {
+      fs.stat(css_scss_file_path, function (err, stats) {
         var newmtime_raw = new Date(stats.mtime);
         var newmtime = newmtime_raw.getTime();
         if(oldmtime != newmtime) {
@@ -215,17 +215,17 @@ app.get('/style.css', function (request, response) {
           wf(cssinfofile, stats.mtime, function () {
             //does not match
             console.log("Recompiling CSS...");
-            compile_css('style.scss', function (css) {
-              wf("compiled.css", css, function () {
+            compile_css(css_scss_file_path, function (css) {
+              wf(compiled_css_path, css, function () {
                 console.log("Finished CSS Compile");
-                response.sendfile(__dirname + '/compiled.css');
+                response.sendfile(compiled_css_path);
               });
             });
           });
         } else {
           //has not changed.
           console.log('Times match. Sending old compiled.css');
-          response.sendfile(__dirname + '/compiled.css');
+          response.sendfile(compiled_css_path);
         }
       });
     });
@@ -245,18 +245,7 @@ app.get('/style.css', function (request, response) {
     }
   });
 });
-app.get('/jquery/jquery-2.0.3.min.js', function (request, response) {
-  response.sendfile(__dirname + '/jquery/jquery-2.0.3.min.js');
-});
-app.get('/jquery/jquery-2.0.3.min.map', function (request, response) {
-  response.sendfile(__dirname + '/jquery/jquery-2.0.3.min.map');
-});
-app.get('/status_computerpowerstate.txt', function (request, response) {
-  response.sendfile(__dirname + '/status_computerpowerstate.txt');
-});
-app.get('/*.jpg', function (request, response) {
-  //response.sendfile(__dirname + '/*.');
-});
+
 
 
 io_local.configure(function(){

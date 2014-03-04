@@ -3,6 +3,4 @@ node_modules/
 private_config.js
 client_config.js
 ip.txt
-status_*
-compiled.css
-info_file_*
+public/compiled/
