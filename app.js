@@ -206,7 +206,7 @@ app.get('/style.css', function (request, response) {
         var newmtime_raw = new Date(stats.mtime);
         var newmtime = newmtime_raw.getTime();
         if(oldmtime != newmtime) {
-          console.log('oldmtime ('+oldmtime+') and stats.mtime ('+stats.mtime+') do not match.');
+          console.log('oldmtime ('+oldmtime+') and newmtime ('+newmtime+') do not match.');
           wf(cssinfofile, stats.mtime, function () {
             //does not match
             console.log("Recompiling CSS...");
