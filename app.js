@@ -7,9 +7,13 @@ var http = require('http');
 var ftp_client = require('ftp');
 
 var fs = require('fs');
-var app = require('express')(),           // start Express framework
-  server = require('http').createServer(app), // start an HTTP server
-  io_local = require('socket.io').listen(server);
+var express = require('express');
+var app = express();           // start Express framework
+app.configure(function(){
+    app.use(express.static(__dirname + '/public'));
+});
+var server = require('http').createServer(app); // start an HTTP server
+var io_local = require('socket.io').listen(server);
 
 var jade = require('jade');
 var sass = require('node-sass');
@@ -192,6 +196,7 @@ app.get('/client_config.js', function (request, response) {
   response.sendfile(__dirname + '/client_config.js');
 });
 app.get('/client.js', function (request, response) {
+  console.log(request.param('name') + ' was requested.');
   response.sendfile(__dirname + '/client.js');
 });
 app.get('/style.css', function (request, response) {
@@ -248,6 +253,9 @@ app.get('/jquery/jquery-2.0.3.min.map', function (request, response) {
 });
 app.get('/status_computerpowerstate.txt', function (request, response) {
   response.sendfile(__dirname + '/status_computerpowerstate.txt');
+});
+app.get('/*.jpg', function (request, response) {
+  //response.sendfile(__dirname + '/*.');
 });
 
 
