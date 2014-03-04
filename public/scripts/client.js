@@ -37,7 +37,6 @@ serial_socket.on('serialParams', function(data) {
 		var spit = "<span class='key'>" + key + "</span>: " + data[key] + "<br/>";
 		$('.serialParams').append(spit);
 	}
-	//console.log(data);
 	if(data.computerpowerstate) {
 		$('body').removeClass().addClass(data.computerpowerstate);
 	}

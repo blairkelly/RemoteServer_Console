@@ -1,36 +1,85 @@
+$break-first: 850px;
+$break-second: 768px;
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 20px;
 	-webkit-transition: background 0.666s;
 	&.on {
-		background: #f8cfff;
-		color: darkgrey;
+		background: #ededed;
+		color: black;
 	}
 	&.sleeping {
-		background: url(/images/stars.jpg) center top no-repeat;
 		background-size: cover;
-		color: white;
+		.container {
+			opacity: .666;
+		}
 	}
 	&.off {
 		background: black;
-		color: white;
+		.container {
+			opacity: .35;
+		}
 	}
 	.container {
 		background: #fff;
 		width: 850px;
-		opacity: 0.667;
-
+		/* opacity: 0.767; */
+		margin: 0 auto;
+		margin-top: 25px;
+		box-sizing: border-box;
+		padding: 25px;
 	}
-}
 
-@media only screen and (max-width: 950px ) {
-	
-}
+	.serialParams {
+		padding: 1em;
+	}
 
-@media screen and (max-width: 768px), screen and (max-device-width: 768px) {
-	
-}
+	.button {
+		padding: 30px 15px;
+		margin-bottom: 20px;
+		cursor: pointer;
+		&.lightblue {
+			background: lightblue;
+			color: #111;
+		}
+		&.blue {
+			background: blue;
+			color: #fefefe;
+		}
+		&.black {
+			background: #111;
+			color: #fff;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-@media screen and (-webkit-device-pixel-ratio: 2) and (max-device-width: 768px) {
-
+	@media only screen and (max-width: $break-first) {
+		.container {
+			width: 100%;
+		}
+	}
+	@media screen and (max-width: $break-second), screen and (max-device-width: $break-second) {
+		font-size: 1em;
+		.container {
+			margin-top: 0;
+			width: 100%;
+			padding: 0;
+		}
+		.button {
+			margin-bottom: 1em;
+			font-size: 2em;
+			padding-top: 1.5em;
+			padding-bottom: 1.5em;
+		}
+	}
+	@media screen and (-webkit-device-pixel-ratio: 2) and (max-device-width: $break-second) {
+		font-size: 2em;
+		.serialParams {
+			font-size: 2em;
+		}
+		
+	}	
 }
