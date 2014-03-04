@@ -1,3 +1,6 @@
+console.log(' ');
+console.log(' ');
+console.log('Remote Server Console. Starting...');
 
 var config = require('./private_config');
 var http = require('http');
@@ -10,11 +13,13 @@ var app = require('express')(),           // start Express framework
 
 var jade = require('jade');
 var sass = require('node-sass');
-var css_last_modified = '';
+var old_css_mtime = null;
 
 var view_data = {
   cps: "off"
 }
+
+console.log(' ');
 
 var serialport = require("serialport"),     // include the serialport library
   SerialPort  = serialport.SerialPort,      // make a local instance of serial
@@ -190,22 +195,50 @@ app.get('/client.js', function (request, response) {
   response.sendfile(__dirname + '/client.js');
 });
 app.get('/style.css', function (request, response) {
-  fs.stat('style.scss', function (err, stats) {
-    if(css_last_modified != stats.mtime) {
-      //times don't match. recompile.
-      console.log("Recompiling CSS...");
-      css_last_modified = stats.mtime;
-      compile_css('style.scss', function (css) {
-        wf("compiled.css", css, function () {
-          console.log("Finished CSS Compile");
+  console.log(' ');
+  var cssinfofile = 'info_file_csslastmodified.txt';
+  var getstatswritemtime = function() {
+    fs.readFile(cssinfofile, function(err, data) {
+      var oldmtime_raw = new Date(data);
+      var oldmtime = oldmtime_raw.getTime();
+      console.log('oldmtime: ' + oldmtime);
+      fs.stat('style.scss', function (err, stats) {
+        var newmtime_raw = new Date(stats.mtime);
+        var newmtime = newmtime_raw.getTime();
+        if(oldmtime != newmtime) {
+          console.log('oldmtime ('+oldmtime+') and stats.mtime ('+stats.mtime+') do not match.');
+          wf(cssinfofile, stats.mtime, function () {
+            //does not match
+            console.log("Recompiling CSS...");
+            compile_css('style.scss', function (css) {
+              wf("compiled.css", css, function () {
+                console.log("Finished CSS Compile");
+                response.sendfile(__dirname + '/compiled.css');
+              });
+            });
+          });
+        } else {
+          //has not changed.
+          console.log('Times match. Sending old compiled.css');
           response.sendfile(__dirname + '/compiled.css');
-        });
+        }
       });
+    });
+  }
+  fs.exists(cssinfofile, function (exists) {
+    if(exists) {
+      //don't bother creating the file first, it already exists
+      console.log('FILE ALREADY EXISTS');
+      getstatswritemtime();
     } else {
-      response.sendfile(__dirname + '/compiled.css');
+      wf(cssinfofile, 'newlycreated', function () {
+        console.log('FILE does not EXIST');
+        console.log('Created new file');
+        getstatswritemtime();
+      });
+      
     }
   });
-  
 });
 app.get('/jquery/jquery-2.0.3.min.js', function (request, response) {
   response.sendfile(__dirname + '/jquery/jquery-2.0.3.min.js');
