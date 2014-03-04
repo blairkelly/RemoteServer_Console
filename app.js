@@ -18,6 +18,7 @@ var io_local = require('socket.io').listen(server);
 var jade = require('jade');
 var sass = require('node-sass');
 var old_css_mtime = null;
+var computerpowerstate = null;
 
 var view_data = {
   cps: "off"
@@ -68,6 +69,7 @@ if(!config.remoteserial) {
         get_my_ip();
       }
       if(params.computerpowerstate) {
+        computerpowerstate = params.computerpowerstate;
         wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
       }
     });
@@ -195,6 +197,7 @@ app.get('/', function (request, response) {
           console.log("get server ip ERROR: " + e.message);
       });
   } else {
+    view_data.cps = computerpowerstate;
     respond();    
   }
 });
