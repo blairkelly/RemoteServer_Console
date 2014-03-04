@@ -151,12 +151,6 @@ io_local.sockets.on('connection', function(socket) {
 });
 
 
-
-get_my_ip();
-
-
-
-
 function wf(thefile, filecontents, docallback) {
     fs.writeFile(thefile, filecontents, function () {
         if(docallback) {
