@@ -168,11 +168,6 @@ function wf(thefile, filecontents, docallback) {
 }
 
 
-get_my_ip();
-
-
-
-
 
 function compile_css(css_file, docallback) {
   sass.render({
@@ -186,6 +181,9 @@ function compile_css(css_file, docallback) {
 }
 
 
+if(config.remoteserial) {
+  get_my_ip();
+}
 
 
 app.get('/', function (request, response) {
