@@ -79,12 +79,14 @@ if(!config.remoteserial) {
   });
 }
 
+
+
 //ftp
 var upload_sip = function () {
   var newdate = new Date();
   var ftp_c = new ftp_client();
   ftp_c.on('ready', function() {
-    ftp_c.put('ip.txt', 'rsc/'+config.ip_filename, function(err) {
+    ftp_c.put('/public/compiled/ip.txt', config.ip_filename, function(err) {
       if (err) throw err;
       ftp_c.end();
       console.log("Updated IP file on Server @ " + newdate);
@@ -103,19 +105,34 @@ var get_ip_options = {
   port: config.get_ip_port,
   path: config.get_ip_path
 };
+var get_recorded_ip_options = {
+  host: config.get_ip_host,
+  port: config.get_ip_port,
+  path: config.ip_filename
+};
 var sip = "ip not set";
 var get_my_ip = function () {
-  http.get(get_ip_options, function(res) {
+  http.get(get_recorded_ip_options, function(res) {
     res.on("data", function(chunk) {
-      sip = chunk;
-      wf("ip.txt", sip, upload_sip);
+      var recorded_ip = chunk;
+      http.get(get_ip_options, function(res) {
+        res.on("data", function(chunk) {
+          sip = chunk;
+          if(recorded_ip != sip) {
+            console.log("ips do not match. uploading new.");
+            wf("/public/compiled/ip.txt", sip, upload_sip);
+          } else {
+            console.log('IPs match. Will not perform upload.');
+          }
+        });
+      }).on('error', function(e) {
+          console.log("get server ip ERROR: " + e.message);
+      });
     });
   }).on('error', function(e) {
-      console.log("get server ip ERROR: " + e.message);
+      console.log("get_recorded_ip_options ERROR: " + e.message);
   });
 }
-
-
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
     var newdate = new Date();
