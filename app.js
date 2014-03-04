@@ -179,7 +179,7 @@ app.get('/', function (request, response) {
       var get_status_options = {
         host: config.remote_serial_ip,
         port: config.listenport,
-        path: "/public/compiled/status_computerpowerstate.txt"
+        path: "/compiled/status_computerpowerstate.txt"
       };
       http.get(get_status_options, function(res) {
           res.on("data", function(chunk) {
