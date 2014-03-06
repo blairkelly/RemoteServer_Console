@@ -53,8 +53,8 @@ serial_socket.on('appParams', function(data) {
 
 var serialcmd = function(command) {
 	serial_socket.emit('serialCommand', command);
-}
 
+}
 $(document).ready(function () {
 	$('.powerbutton').on('click', function () {
 		var thisbtn = $(this);
@@ -63,13 +63,13 @@ $(document).ready(function () {
 			if(thisbtn.hasClass('disabled')) {
 				//do nothing
 			} else {
-				//serialcmd('p760');
+				serialcmd('p760');
 			}
 		} else if(thisbtn.hasClass('turnoffcomputer')) {
 			if(thisbtn.hasClass('disabled')) {
 				//do nothing
 			} else {
-				//serialcmd('p5100');
+				serialcmd('p5100');
 			}
 		}
 	});
