@@ -58,19 +58,15 @@ var serialcmd = function(command) {
 $(document).ready(function () {
 	$('.powerbutton').on('click', function () {
 		var thisbtn = $(this);
-		$('.powerbutton').removeClass('enabled').addClass('disabled');
-		if(thisbtn.hasClass('pushpowerbutton')) {
-			if(thisbtn.hasClass('disabled')) {
-				//do nothing
-			} else {
+		if(thisbtn.hasClass('disabled')) {
+			//do nothing
+		} else {
+			if(thisbtn.hasClass('pushpowerbutton')) {
 				serialcmd('p760');
-			}
-		} else if(thisbtn.hasClass('turnoffcomputer')) {
-			if(thisbtn.hasClass('disabled')) {
-				//do nothing
-			} else {
+			} else if(thisbtn.hasClass('turnoffcomputer')) {
 				serialcmd('p5100');
 			}
+			$('.powerbutton').removeClass('enabled').addClass('disabled');
 		}
 	});
 	$('.computerpowerstatus').on('click', function () {
