@@ -41,18 +41,37 @@ serial_socket.on('serialParams', function(data) {
 		$('body').removeClass().addClass(data.computerpowerstate);
 	}
 });
-
+serial_socket.on('appParams', function(data) {
+	if(data.pbstatus) {
+		if(data.pbstatus == "enabled") {
+			$('.pushpowerbutton,.turnoffcomputer').removeClass('disabled').addClass('enabled');
+		} else {
+			$('.powerbutton').removeClass('enabled').addClass('disabled');
+		}
+	}
+});
 
 var serialcmd = function(command) {
 	serial_socket.emit('serialCommand', command);
 }
 
 $(document).ready(function () {
-	$('.pushpowerbutton').on('click', function () {
-		serialcmd('p760');
-	});
-	$('.turnoffcomputer').on('click', function () {
-		serialcmd('p5100');
+	$('.powerbutton').on('click', function () {
+		var thisbtn = $(this);
+		$('.powerbutton').removeClass('enabled').addClass('disabled');
+		if(thisbtn.hasClass('pushpowerbutton')) {
+			if(thisbtn.hasClass('disabled')) {
+				//do nothing
+			} else {
+				//serialcmd('p760');
+			}
+		} else if(thisbtn.hasClass('turnoffcomputer')) {
+			if(thisbtn.hasClass('disabled')) {
+				//do nothing
+			} else {
+				//serialcmd('p5100');
+			}
+		}
 	});
 	$('.computerpowerstatus').on('click', function () {
 		serialcmd('s1');

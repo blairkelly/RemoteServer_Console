@@ -73,6 +73,10 @@ body {
 			font-size: 2em;
 			padding-top: 1.5em;
 			padding-bottom: 1.5em;
+			&.disabled {
+				opacity: 0.75;
+				background-color: #aaa;
+			}
 		}
 	}
 	@media screen and (-webkit-device-pixel-ratio: 2) and (max-device-width: $break-second) {

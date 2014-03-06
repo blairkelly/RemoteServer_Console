@@ -8,8 +8,8 @@ html(lang="en")
   body(class=viewdata.cps)
     .container
       .button.lightblue.computerpowerstatus Computer Power State
-      .button.blue.pushpowerbutton Press Power Button
-      .button.black.turnoffcomputer Turn Computer Off
+      .button.blue.powerbutton.pushpowerbutton(class=viewdata.pbenabled) Press Power Button
+      .button.black.powerbutton.turnoffcomputer(class=viewdata.pbenabled) Turn Computer Off
       .serialParams
   script(src="/scripts/jquery/jquery-2.0.3.min.js")
   script(src="/scripts/client_config.js")

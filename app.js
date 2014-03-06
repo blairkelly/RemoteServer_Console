@@ -19,9 +19,11 @@ var jade = require('jade');
 var sass = require('node-sass');
 var old_css_mtime = null;
 var computerpowerstate = null;
+var computerpowerstate_recentlychanged = false;
 
 var view_data = {
-  cps: "off"
+  cps: "off",
+  pbenabled: "enabled"
 }
 
 console.log(' ');
@@ -69,8 +71,29 @@ if(!config.remoteserial) {
         get_my_ip();
       }
       if(params.computerpowerstate) {
-        computerpowerstate = params.computerpowerstate;
-        wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
+        if(computerpowerstate != params.computerpowerstate) {
+          io_local.sockets.emit('appParams', {
+            pbstatus: 'disabled'
+          });
+          computerpowerstate = params.computerpowerstate;
+          wf(__dirname + '/public/compiled/status_computerpowerstate.txt', params.computerpowerstate);
+          computerpowerstate_recentlychanged = true;
+          setTimeout(function () {
+            computerpowerstate_recentlychanged = false;
+            io_local.sockets.emit('appParams', {
+              pbstatus: 'enabled'
+            });
+          }, 7500);
+        }
+      }
+      if(params.actionstatus) {
+        if(params.actionstatus == "fpbp") {
+          if(!computerpowerstate_recentlychanged) {
+            io_local.sockets.emit('appParams', {
+              pbstatus: 'enabled'
+            });
+          }
+        }
       }
     });
     //get a status code.
