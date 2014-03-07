@@ -7,11 +7,15 @@ html(lang="en")
     script(src="/socket.io/socket.io.js")
   body(class=viewdata.cps)
     .container
-      .button.lightblue.computerpowerstatus Computer Power State
-      .button.blue.powerbutton.pushpowerbutton(class=viewdata.pbenabled) Press Power Button
-      .button.black.powerbutton.turnoffcomputer(class=viewdata.pbenabled) Turn Computer Off
+      .button.lightblue.computerpowerstatus
+        div
+      .button.blue.powerbutton.pushpowerbutton(class=viewdata.pbenabled)
+        .delay(data-val=900)
+        .adjustholder
+          .timeadjust.down
+          .timeadjust.up
+      .button.black.powerbutton.turnoffcomputer(class=viewdata.pbenabled)
       .button_cover.hidden
-    .serialParams.hidden
   script(src="/scripts/jquery/jquery-2.0.3.min.js")
   script(src="/scripts/client_config.js")
   script(src="/scripts/client.js")

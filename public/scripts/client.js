@@ -38,10 +38,10 @@ if( typeof remote_serial_ip === 'undefined' ) {
 
 
 serial_socket.on('serialParams', function(data) {
-	$('.serialParams').html(''); //clear it
+	$('.computerpowerstatus div').html(''); //clear it
 	for(key in data) {
 		var spit = "<span class='key'>" + key + "</span>: " + data[key] + "<br/>";
-		$('.serialParams').append(spit);
+		$('.computerpowerstatus div').append(spit);
 	}
 	if(data.computerpowerstate) {
 		$('body').removeClass().addClass(data.computerpowerstate);
@@ -62,13 +62,33 @@ var serialcmd = function(command) {
 }
 
 $(document).ready(function () {
+	$('.button .adjustholder').on('click ' + downevent + ' ' + upevent, function (event) {
+		event.preventDefault();
+		event.stopPropagation();
+	});
+	$('.timeadjust.up').on(downevent, function() {
+		var delay_div = $('.pushpowerbutton .delay');
+		var delay = delay_div.data('val');
+		delay = delay + 100;
+		delay_div.data('val', delay);
+		delay_div.html(delay);
+	});
+	$('.timeadjust.down').on(downevent, function() {
+		var delay_div = $('.pushpowerbutton .delay');
+		var delay = delay_div.data('val');
+		delay = delay - 50;
+		delay_div.data('val', delay);
+		delay_div.html(delay);
+	});
 	$('.powerbutton').on('click', function () {
 		var thisbtn = $(this);
 		if(thisbtn.hasClass('disabled')) {
 			//do nothing
 		} else {
 			if(thisbtn.hasClass('pushpowerbutton')) {
-				serialcmd('p760');
+				var delay_div = $(this).find('.delay');
+				var delay = delay_div.data('val');
+				serialcmd('p'+delay);
 			} else if(thisbtn.hasClass('turnoffcomputer')) {
 				serialcmd('p5100');
 			}
@@ -76,7 +96,6 @@ $(document).ready(function () {
 		}
 	});
 	$('.computerpowerstatus').on('click', function () {
-		$('.serialParams').removeClass('hidden');
 		serialcmd('s1');
 	});
 });
@@ -108,7 +127,7 @@ var button_cover_move_event = function (event) {
 					button_cover.data('removed', false);
 					//$('body').append('crinkle<br/>').css('color', 'white');
 				});
-			}, 1500);
+			}, 15000);
 		}
 	}
 }
@@ -157,6 +176,15 @@ var do_resize = function () {
 	var cover_height = $('.turnoffcomputer').position().top - button_top + $('.turnoffcomputer').outerHeight();
 	button_cover.css('top', button_top + 'px').css('left', button_left + 'px').css('height', cover_height + 'px').css('width', $('.pushpowerbutton').outerWidth() + 'px');
 	button_cover.data('originalx', button_left);
+	var powerbutton = $('.pushpowerbutton');
+	var pb_vd = powerbutton.find('.delay');
+	var pb_vd_val = pb_vd.data('val');
+	pb_vd.html(pb_vd_val);
+	var pb_vd_height = pb_vd.outerHeight();
+	var buttoncurrentheight = $('.button').outerHeight();
+	var pb_vd_top = (buttoncurrentheight - pb_vd_height) / 2;
+	pb_vd.css('top', pb_vd_top + 'px');
+	$('.timeadjust').css('height', buttoncurrentheight + 'px');
 }
 $(window).on('resize', function () {
 	do_resize();
