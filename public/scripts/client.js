@@ -82,6 +82,7 @@ $(document).ready(function () {
 });
 
 var button_cover = $('.button_cover');
+button_cover.data('removed', false);
 var button_cover_move_event = function (event) {
 	event = event.originalEvent;
 	event.preventDefault();
@@ -95,16 +96,18 @@ var button_cover_move_event = function (event) {
 	var originalx = button_cover.data('originalx');
 	if(difference >= 0) {
 		button_cover.css('left', (originalx+difference)+'px');
-		if(difference > minslide) {
+		if((difference > minslide) && !button_cover.data('removed')) {
 			button_cover.data('removed', true);
-			button_cover.fadeTo(150, 0, function () {
+			button_cover.fadeTo(120, 0, function () {
 				button_cover.hide();
 				button_cover.css('left', originalx+'px');
 				button_cover.off(moveevent, button_cover_move_event);
-				button_cover.data('removed', false);
 			});
 			setTimeout(function () {
-				button_cover.fadeTo(100, 1);
+				button_cover.fadeTo(100, 1, function () {
+					button_cover.data('removed', false);
+					//$('body').append('crinkle<br/>').css('color', 'white');
+				});
 			}, 1500);
 		}
 	}
