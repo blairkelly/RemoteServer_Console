@@ -21,6 +21,9 @@ body {
 			opacity: .35;
 		}
 	}
+	.hidden {
+		display: none;
+	}
 	.container {
 		background: #fff;
 		width: 850px;
@@ -29,16 +32,21 @@ body {
 		margin-top: 25px;
 		box-sizing: border-box;
 		padding: 25px;
+		position: relative;
 	}
 
 	.serialParams {
+		background: #fff;
 		padding: 1em;
+		margin-top: 3em;
 	}
 
 	.button {
+		box-sizing: border-box;
 		padding: 30px 15px;
 		margin-bottom: 20px;
 		cursor: pointer;
+		-webkit-user-select: none;
 		&.lightblue {
 			background: lightblue;
 			color: #111;
@@ -60,9 +68,28 @@ body {
 		}
 	}
 
+	.button_cover {
+		position: absolute;
+		top: 0;
+		left: 0;
+		border: 0.15em solid red;
+		background-color:rgba(220,33,33,0.5);
+		color: white;
+		box-sizing: border-box;
+
+		-webkit-user-select: none;  /* Chrome all / Safari all */
+		-moz-user-select: none;     /* Firefox all */
+		-ms-user-select: none;      /* IE 10+ */
+
+		/* No support for these yet, use at own risk */
+		-o-user-select: none;
+		user-select: none;      
+	}
+
 	@media only screen and (max-width: $break-first) {
 		.container {
 			width: 100%;
+			overflow: hidden;
 		}
 	}
 	@media screen and (max-width: $break-second), screen and (max-device-width: $break-second) {
@@ -70,10 +97,14 @@ body {
 		.container {
 			margin-top: 0;
 			width: 100%;
-			padding: 0;
+			padding: 1em;
+			padding-top: 0;
+			padding-bottom: 0;
+			height: 100%;
+			overflow: hidden;
 		}
 		.button {
-			margin-bottom: 1em;
+			margin-bottom: 0;
 			font-size: 2em;
 			padding-top: 1.5em;
 			padding-bottom: 1.5em;

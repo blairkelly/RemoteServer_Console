@@ -8,7 +8,8 @@
     params.rhb= Heartbeat!
 */
 
-
+var window_width = $(window).width();
+var window_height = $(window).height();
 var app_socket = io.connect('//'+serverip+':'+serverport);
 var serial_socket = app_socket;
 
@@ -17,6 +18,11 @@ app_socket.on('welcome', function(data) {
     console.log('Handshake address: ' + data.address);
 });
 
+var ismobile = ((/iphone|ipad|android/gi).test(navigator.appVersion));
+
+var downevent = ismobile ? "touchstart" : "mousedown";
+var upevent = ismobile ? "touchend" : "mouseup";
+var moveevent = ismobile ? "touchmove" : "mousemove";
 
 //if I just need to issue commands and receive data from a remote serial (i.e. for use during development)
 //this might not even be necessary, I'm not sure yet. (still a noob)
@@ -53,8 +59,8 @@ serial_socket.on('appParams', function(data) {
 
 var serialcmd = function(command) {
 	serial_socket.emit('serialCommand', command);
-
 }
+
 $(document).ready(function () {
 	$('.powerbutton').on('click', function () {
 		var thisbtn = $(this);
@@ -70,6 +76,87 @@ $(document).ready(function () {
 		}
 	});
 	$('.computerpowerstatus').on('click', function () {
+		$('.serialParams').removeClass('hidden');
 		serialcmd('s1');
 	});
 });
+
+var button_cover = $('.button_cover');
+var button_cover_move_event = function (event) {
+	event = event.originalEvent;
+	event.preventDefault();
+	event.stopPropagation();
+	var point = event.touches ? event.touches[0] : event;
+	var pX = point.pageX;
+	var startX = button_cover.data('mstart');
+	var difference = pX - startX;
+	//$(this).html(difference);
+	var minslide = button_cover.outerWidth() * 0.20;
+	var originalx = button_cover.data('originalx');
+	if(difference >= 0) {
+		button_cover.css('left', (originalx+difference)+'px');
+		if(difference > minslide) {
+			button_cover.data('removed', true);
+			button_cover.fadeTo(150, 0, function () {
+				button_cover.hide();
+				button_cover.css('left', originalx+'px');
+				button_cover.off(moveevent, button_cover_move_event);
+				button_cover.data('removed', false);
+			});
+			setTimeout(function () {
+				button_cover.fadeTo(100, 1);
+			}, 1500);
+		}
+	}
+}
+button_cover.on(downevent, function (event) {
+	event = event.originalEvent;
+	event.preventDefault();
+	event.stopPropagation();
+	var point = event.touches ? event.touches[0] : event;
+	var pX = point.pageX;
+	$(this).data('mstart', pX);
+	button_cover.on(moveevent, button_cover_move_event);
+});
+button_cover.on(upevent, function (event) {
+	event = event.originalEvent;
+	event.stopPropagation();
+	if(!button_cover.data('removed')) {
+		var originalx = button_cover.data('originalx');
+		button_cover.css('left', originalx+'px');
+		button_cover.off(moveevent, button_cover_move_event);
+	}
+});
+
+
+var do_resize = function () {
+	var container = $('.container');
+	window_width = $(window).width();
+	window_height = $(window).height();
+	var referencewidth = 768;
+	if(window.devicePixelRatio > 1) {
+		referencewidth = 1000;
+	}
+	if(window_width <= referencewidth) {
+		var padding = (window_height * 0.02) + 'px';
+		var buttonheight = ((window_height * .96) / 3) + 'px';
+		container.css('height', window_height + 'px').css('padding-top', padding);
+		$('.button').css('height', buttonheight);
+	} else {
+		var attr = container.attr('style');
+		if(typeof attr !== 'undefined' && attr !== false) {
+			container.removeAttr('style');
+			$('.button').removeAttr('style');
+		}
+	}
+	var button_top = $('.pushpowerbutton').position().top;
+	var button_left = $('.pushpowerbutton').position().left;
+	var cover_height = $('.turnoffcomputer').position().top - button_top + $('.turnoffcomputer').outerHeight();
+	button_cover.css('top', button_top + 'px').css('left', button_left + 'px').css('height', cover_height + 'px').css('width', $('.pushpowerbutton').outerWidth() + 'px');
+	button_cover.data('originalx', button_left);
+}
+$(window).on('resize', function () {
+	do_resize();
+});
+do_resize();
+button_cover.removeClass('hidden');
