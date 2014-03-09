@@ -5,6 +5,9 @@ body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 20px;
 	-webkit-transition: background 0.666s;
+    -moz-transition: background 0.666s;
+    -o-transition: background 0.666s;
+    transition: background 0.666s;
 	&.on {
 		background: #ededed;
 		color: black;
