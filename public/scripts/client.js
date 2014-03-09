@@ -111,7 +111,7 @@ var button_cover_move_event = function (event) {
 	var startX = button_cover.data('mstart');
 	var difference = pX - startX;
 	//$(this).html(difference);
-	var minslide = button_cover.outerWidth() * 0.20;
+	var minslide = button_cover.outerWidth() * 0.666;
 	var originalx = button_cover.data('originalx');
 	if(difference >= 0) {
 		button_cover.css('left', (originalx+difference)+'px');
