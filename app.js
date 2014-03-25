@@ -21,6 +21,42 @@ var old_css_mtime = null;
 var computerpowerstate = null;
 var computerpowerstate_recentlychanged = false;
 
+
+
+
+
+
+var io_client = require('socket.io-client')
+var socket_client = io_client.connect('blairkelly.jit.su:80', {reconnect: true});
+//var socket_client = io_client.connect('127.0.0.1:3000', {reconnect: true});
+socket_client.on('connect', function(){
+  console.log('connected to blairkelly.jit.su');
+  socket_client.emit('sockets_console', 'alive');
+
+  socket_client.on('hello_sockets', function(){
+    console.log("hello_sockets received...");
+    socket_client.emit('give_my_ip');
+  });
+
+  socket_client.on('socket_data', function(data) {
+    af(__dirname + '/public/recorded.json', JSON.stringify(data, null, 4));
+  });
+
+  socket_client.on('ip', function (reported_ip) {
+    console.log('server reports my ip address is: ' + reported_ip);
+  });
+
+  socket_client.on('disconnect', function(){
+    console.log('disconnected from socket server');
+    socket_client.removeAllListeners('hello_sockets');
+    socket_client.removeAllListeners('socket_data');
+    socket_client.removeAllListeners('ip');
+  });
+});
+
+
+
+
 var view_data = {
   cps: "off",
   pbenabled: "enabled"
@@ -163,6 +199,9 @@ var get_my_ip = function () {
   }).on('error', function(e) {
       console.log("get_recorded_ip_options ERROR: " + e.message);
   });
+
+  //socket version
+  socket_client.emit('give_my_ip');
 }
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
@@ -181,7 +220,13 @@ io_local.sockets.on('connection', function(socket) {
     });
 });
 
-
+function af(thefile, filecontents, docallback) {
+    fs.appendFile(thefile, filecontents, function () {
+        if(docallback) {
+          docallback();
+        }
+    });
+}
 function wf(thefile, filecontents, docallback) {
     fs.writeFile(thefile, filecontents, function () {
         if(docallback) {
