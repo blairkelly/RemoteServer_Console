@@ -83,15 +83,23 @@ socket_client.on('connect', function(){
       //to do... write system for recording occurences.
       var incoming_analytics_stringified = JSON.stringify(data.analytics);
       if(saved_data.analytics) {
+        var ana_match = false;
         for(var i=0; i < saved_data.analytics.length; i++) {
           var existing_analytics = JSON.stringify(saved_data.analytics[i]);
           if(incoming_analytics_stringified == existing_analytics) {
             // already exists in this list. don't add
+            ana_match = true;
           } else {
-            saved_data.analytics.push(data.analytics);
+            //do nothing
           }
         }
+        if(ana_match) {
+          //do nothing
+        } else {
+          saved_data.analytics.push(data.analytics);
+        }
       } else {
+        console.log('recorded anas');
         saved_data.analytics = [];
         saved_data.analytics.push(data.analytics);
       }
