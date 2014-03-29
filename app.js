@@ -24,9 +24,21 @@ var computerpowerstate_recentlychanged = false;
 
 
 
-
-
-var io_client = require('socket.io-client')
+var recorded_json_location = __dirname + '/public/recorded.json';
+var saved_data = {}
+rf(recorded_json_location, function (data) {
+  if(data.length > 0) {
+    saved_data = JSON.parse(data);
+    console.log("Saved data: ", saved_data);
+  } else {
+    console.log("nothing in saved data file");
+  }  
+  if(!saved_data.max_clients_ever) {
+    saved_data.max_clients_ever = 0;
+    wj(recorded_json_location, saved_data);
+  }
+});
+var io_client = require('socket.io-client');
 var socket_client = io_client.connect('blairkelly.jit.su:80', {reconnect: true});
 //var socket_client = io_client.connect('127.0.0.1:3000', {reconnect: true});
 socket_client.on('connect', function(){
@@ -39,7 +51,60 @@ socket_client.on('connect', function(){
   });
 
   socket_client.on('socket_data', function(data) {
-    af(__dirname + '/public/recorded.json', JSON.stringify(data, null, 4));
+    //af(recorded_json_location, JSON.stringify(data, null, 4));
+    if(data.message) {
+      if(data.message == "New Client Connected") {
+        if(saved_data.total_connects_recorded) {
+          saved_data.total_connects_recorded++;
+        } else {
+          saved_data.total_connects_recorded = 1;
+        }
+      }
+      if(data.message == "Client Disconnected") {
+        if(saved_data.total_disconnects_recorded) {
+          saved_data.total_disconnects_recorded++;
+        } else {
+          saved_data.total_disconnects_recorded = 1;
+        }
+      }
+      saved_data.latest_message = data.message;
+    }
+    if(data.num_socket_clients) {
+      saved_data.num_socket_clients = data.num_socket_clients;
+    }
+    if(data.peak_sockets_this_cycle) {
+      if(data.peak_sockets_this_cycle > saved_data.max_clients_ever) {
+        console.log("Peak record.");
+        saved_data.max_clients_ever = data.peak_sockets_this_cycle;
+      }
+      saved_data.peak_sockets_this_cycle = data.peak_sockets_this_cycle;
+    }
+    if(data.analytics) {
+      //to do... write system for recording occurences.
+      var incoming_analytics_stringified = JSON.stringify(data.analytics);
+      if(saved_data.analytics) {
+        for(var i=0; i < saved_data.analytics.length; i++) {
+          var existing_analytics = JSON.stringify(saved_data.analytics[i]);
+          if(incoming_analytics_stringified == existing_analytics) {
+            // already exists in this list. don't add
+          } else {
+            saved_data.analytics.push(data.analytics);
+          }
+        }
+      } else {
+        saved_data.analytics = [];
+        saved_data.analytics.push(data.analytics);
+      }
+    }
+    if(data.commentdata) {
+      if(saved_data.commentdata) {
+        saved_data.commentdata.push(data.commentdata);
+      } else {
+        saved_data.commentdata = [];
+        saved_data.commentdata.push(data.commentdata);
+      }
+    }
+    wj(recorded_json_location, saved_data);
   });
 
   socket_client.on('ip', function (reported_ip) {
@@ -234,7 +299,21 @@ function wf(thefile, filecontents, docallback) {
         }
     });
 }
-
+function wj(thefile, filecontents, docallback) {
+    fs.writeFile(thefile, JSON.stringify(filecontents), function () {
+        if(docallback) {
+          docallback();
+        }
+    });
+}
+function rf(thefile, docallback) {
+    fs.readFile(thefile, function (err,data) {
+        if (err) throw err;
+        if(docallback) {
+          docallback(data);
+        }
+    });
+}
 
 
 function compile_css(css_file, docallback) {
@@ -285,6 +364,12 @@ app.get('/', function (request, response) {
     view_data.cps = computerpowerstate;
     respond();    
   }
+});
+
+app.get('/recorded', function (req, res) {
+  var stringified_saved = JSON.stringify(saved_data, null, 4);
+  var res_html = '<div><pre>'+stringified_saved+'</pre></div>'
+  res.send(res_html);
 });
 
 app.get('/styles/style.css', function (request, response) {
