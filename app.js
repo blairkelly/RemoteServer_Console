@@ -4,7 +4,8 @@ console.log('Remote Server Console. Starting...');
 
 var config = require('./private_config');
 var http = require('http');
-var ftp_client = require('ftp');
+
+var request = require('request');
 
 var fs = require('fs');
 var express = require('express');
@@ -37,9 +38,13 @@ rf(recorded_json_location, function (data) {
     wj(recorded_json_location, saved_data);
   }
 });
-var io_client = require('socket.io-client');
-var socket_client = io_client.connect(config.socket_client_connect_address, {reconnect: true});
+
+
+
+//var io_client = require('socket.io-client');
+//var socket_client = io_client.connect(config.socket_client_connect_address, {reconnect: true});
 //var socket_client = io_client.connect('127.0.0.1:3000', {reconnect: true});
+/*
 socket_client.on('connect', function(){
   console.log('connected to ' + config.socket_client_connect_address);
   socket_client.emit(config.socket_client_passphrase);
@@ -61,6 +66,7 @@ socket_client.on('connect', function(){
     socket_client.removeAllListeners('ip');
   });
 });
+*/
 
 
 
@@ -156,12 +162,16 @@ var clean_ip_string = function (this_ip) {
   return cleaned_ip;
 }
 
+
 //ip stuff
 var get_ip_options = {
   host: config.get_ip_host,
   port: config.get_ip_port,
   path: config.get_ip_path
 };
+//post options
+var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
+console.log('post_ip_form_location: ' + post_ip_form_location);
 
 
 var sip = "ip not set";
@@ -169,11 +179,25 @@ var get_my_ip = function () {
   http.get(get_ip_options, function(res) {
     res.on("data", function(chunk) {
       var recorded_ip = clean_ip_string(chunk);
+      request.post(
+          post_ip_form_location,
+          { form: { key: recorded_ip } },
+          function (error, response, body) {
+              if (!error && response.statusCode == 200) {
+                  console.log(body)
+              } else if (error) {
+                console.log("post-ing exploded somehow ERROR: " + error);
+              }
+          }
+      );
+
     });
   }).on('error', function(e) {
       console.log("get_recorded_ip_options ERROR: " + e.message);
   });
 }
+
+
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
     var newdate = new Date();

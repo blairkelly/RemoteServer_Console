@@ -13,7 +13,8 @@
     "ftp": "~0.3.6",
     "jade": "~1.2.0",
     "node-sass": "~0.8.1",
-    "socket.io-client": "~0.9.16"
+    "socket.io-client": "~0.9.16",
+    "request": "~2.34.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
