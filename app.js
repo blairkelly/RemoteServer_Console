@@ -29,7 +29,6 @@ var saved_data = {}
 rf(recorded_json_location, function (data) {
   if(data.length > 0) {
     saved_data = JSON.parse(data);
-    console.log("Saved data: ", saved_data);
   } else {
     console.log("nothing in saved data file");
   }  
@@ -39,84 +38,20 @@ rf(recorded_json_location, function (data) {
   }
 });
 var io_client = require('socket.io-client');
-var socket_client = io_client.connect('blairkelly.jit.su:80', {reconnect: true});
+var socket_client = io_client.connect(config.socket_client_connect_address, {reconnect: true});
 //var socket_client = io_client.connect('127.0.0.1:3000', {reconnect: true});
 socket_client.on('connect', function(){
-  console.log('connected to blairkelly.jit.su');
-  socket_client.emit('sockets_console', 'alive');
+  console.log('connected to ' + config.socket_client_connect_address);
+  socket_client.emit(config.socket_client_passphrase);
 
-  socket_client.on('hello_sockets', function(){
+  socket_client.on('hello_rsc', function(){
     console.log("hello_sockets received...");
-    socket_client.emit('give_my_ip');
+    //GET IP GET IP, SEND IP SEND IP
   });
 
   socket_client.on('socket_data', function(data) {
     //af(recorded_json_location, JSON.stringify(data, null, 4));
-    if(data.message) {
-      if(data.message == "New Client Connected") {
-        if(saved_data.total_connects_recorded) {
-          saved_data.total_connects_recorded++;
-        } else {
-          saved_data.total_connects_recorded = 1;
-        }
-      }
-      if(data.message == "Client Disconnected") {
-        if(saved_data.total_disconnects_recorded) {
-          saved_data.total_disconnects_recorded++;
-        } else {
-          saved_data.total_disconnects_recorded = 1;
-        }
-      }
-      saved_data.latest_message = data.message;
-    }
-    if(data.num_socket_clients) {
-      saved_data.num_socket_clients = data.num_socket_clients;
-    }
-    if(data.peak_sockets_this_cycle) {
-      if(data.peak_sockets_this_cycle > saved_data.max_clients_ever) {
-        console.log("Peak record.");
-        saved_data.max_clients_ever = data.peak_sockets_this_cycle;
-      }
-      saved_data.peak_sockets_this_cycle = data.peak_sockets_this_cycle;
-    }
-    if(data.analytics) {
-      //to do... write system for recording occurences.
-      var incoming_analytics_stringified = JSON.stringify(data.analytics);
-      if(saved_data.analytics) {
-        var ana_match = false;
-        for(var i=0; i < saved_data.analytics.length; i++) {
-          var existing_analytics = JSON.stringify(saved_data.analytics[i]);
-          if(incoming_analytics_stringified == existing_analytics) {
-            // already exists in this list. don't add
-            ana_match = true;
-          } else {
-            //do nothing
-          }
-        }
-        if(ana_match) {
-          //do nothing
-        } else {
-          saved_data.analytics.push(data.analytics);
-        }
-      } else {
-        console.log('recorded anas');
-        saved_data.analytics = [];
-        saved_data.analytics.push(data.analytics);
-      }
-    }
-    if(data.commentdata) {
-      if(saved_data.commentdata) {
-        saved_data.commentdata.push(data.commentdata);
-      } else {
-        saved_data.commentdata = [];
-        saved_data.commentdata.push(data.commentdata);
-      }
-    }
-    wj(recorded_json_location, saved_data);
-  });
-
-  socket_client.on('ip', function (reported_ip) {
-    console.log('server reports my ip address is: ' + reported_ip);
+    //wj(recorded_json_location, saved_data);
   });
 
   socket_client.on('disconnect', function(){
@@ -221,60 +156,24 @@ var clean_ip_string = function (this_ip) {
   return cleaned_ip;
 }
 
-//ftp
-var upload_sip = function () {
-  var newdate = new Date();
-  var ftp_c = new ftp_client();
-  ftp_c.on('ready', function() {
-    ftp_c.put('public/compiled/ip.txt', config.ip_filename, function(err) {
-      if (err) throw err;
-      ftp_c.end();
-      console.log("Updated IP file on Server @ " + newdate);
-    });
-  });
-  var ftp_connect_options = {
-    host: config.ftp_address,
-    user: config.ftp_user,
-    password: config.ftp_pass
-  };
-  ftp_c.connect(ftp_connect_options);
-}
 //ip stuff
 var get_ip_options = {
   host: config.get_ip_host,
   port: config.get_ip_port,
   path: config.get_ip_path
 };
-var get_recorded_ip_options = {
-  host: config.get_ip_host,
-  port: config.get_ip_port,
-  path: config.ip_filename
-};
+
+
 var sip = "ip not set";
 var get_my_ip = function () {
-  http.get(get_recorded_ip_options, function(res) {
+  http.get(get_ip_options, function(res) {
     res.on("data", function(chunk) {
       var recorded_ip = clean_ip_string(chunk);
-      http.get(get_ip_options, function(res) {
-        res.on("data", function(chunk) {
-          sip = clean_ip_string(chunk);
-          if(recorded_ip != sip) {
-            console.log("ips do not match. uploading new.");
-            wf("public/compiled/ip.txt", sip, upload_sip);
-          } else {
-            console.log('IPs match. Will not perform upload.');
-          }
-        });
-      }).on('error', function(e) {
-          console.log("get server ip ERROR: " + e.message);
-      });
+      console.log(recorded_ip);
     });
   }).on('error', function(e) {
       console.log("get_recorded_ip_options ERROR: " + e.message);
   });
-
-  //socket version
-  socket_client.emit('give_my_ip');
 }
 // Emit welcome message on connection
 io_local.sockets.on('connection', function(socket) {
