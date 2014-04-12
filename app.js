@@ -169,7 +169,6 @@ var get_my_ip = function () {
   http.get(get_ip_options, function(res) {
     res.on("data", function(chunk) {
       var recorded_ip = clean_ip_string(chunk);
-      console.log(recorded_ip);
     });
   }).on('error', function(e) {
       console.log("get_recorded_ip_options ERROR: " + e.message);
