@@ -41,35 +41,6 @@ rf(recorded_json_location, function (data) {
 
 
 
-//var io_client = require('socket.io-client');
-//var socket_client = io_client.connect(config.socket_client_connect_address, {reconnect: true});
-//var socket_client = io_client.connect('127.0.0.1:3000', {reconnect: true});
-/*
-socket_client.on('connect', function(){
-  console.log('connected to ' + config.socket_client_connect_address);
-  socket_client.emit(config.socket_client_passphrase);
-
-  socket_client.on('hello_rsc', function(){
-    console.log("hello_sockets received...");
-    //GET IP GET IP, SEND IP SEND IP
-  });
-
-  socket_client.on('socket_data', function(data) {
-    //af(recorded_json_location, JSON.stringify(data, null, 4));
-    //wj(recorded_json_location, saved_data);
-  });
-
-  socket_client.on('disconnect', function(){
-    console.log('disconnected from socket server');
-    socket_client.removeAllListeners('hello_sockets');
-    socket_client.removeAllListeners('socket_data');
-    socket_client.removeAllListeners('ip');
-  });
-});
-*/
-
-
-
 
 var view_data = {
   cps: "off",
