@@ -154,6 +154,7 @@ var get_my_ip = function () {
     http.get(get_ip_options, function(res) {
       res.on("data", function(chunk) {
         var recorded_ip = clean_ip_string(chunk);
+        console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
         request.post(
             post_ip_form_location,
             { form: { key: recorded_ip, secret: config.post_secret } },
@@ -168,6 +169,7 @@ var get_my_ip = function () {
                 setTimeout(function () {
                   get_my_ip();
                 }, 240000)
+                console.log("done post");
             }
         );
 
