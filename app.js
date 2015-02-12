@@ -145,29 +145,37 @@ var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_
 console.log('post_ip_form_location: ' + post_ip_form_location);
 
 
+var getting_ip = false;
 var sip = "ip not set";
 var get_my_ip = function () {
-  console.log("Getting ip...");
-  http.get(get_ip_options, function(res) {
-    res.on("data", function(chunk) {
-      var recorded_ip = clean_ip_string(chunk);
-      request.post(
-          post_ip_form_location,
-          { form: { key: recorded_ip, secret: config.post_secret } },
-          function (error, response, body) {
-              if (!error && response.statusCode == 200) {
-                console.log('success posting ip');
-                console.log(body)
-              } else if (error) {
-                console.log("post-ing exploded somehow ERROR: " + error);
-              }
-          }
-      );
+  if (!getting_ip) {
+    getting_ip = true;
+    console.log("Getting ip...");
+    http.get(get_ip_options, function(res) {
+      res.on("data", function(chunk) {
+        var recorded_ip = clean_ip_string(chunk);
+        request.post(
+            post_ip_form_location,
+            { form: { key: recorded_ip, secret: config.post_secret } },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  console.log('success posting ip');
+                  console.log(body)
+                } else if (error) {
+                  console.log("post-ing exploded somehow ERROR: " + error);
+                }
+                getting_ip = false;
+                setTimeout(function () {
+                  get_my_ip();
+                }, 240000)
+            }
+        );
 
+      });
+    }).on('error', function(e) {
+        console.log("get_recorded_ip_options ERROR: " + e.message);
     });
-  }).on('error', function(e) {
-      console.log("get_recorded_ip_options ERROR: " + e.message);
-  });
+  }
 }
 
 
