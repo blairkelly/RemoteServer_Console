@@ -147,6 +147,7 @@ console.log('post_ip_form_location: ' + post_ip_form_location);
 
 var sip = "ip not set";
 var get_my_ip = function () {
+  console.log("Getting ip...");
   http.get(get_ip_options, function(res) {
     res.on("data", function(chunk) {
       var recorded_ip = clean_ip_string(chunk);
@@ -155,7 +156,8 @@ var get_my_ip = function () {
           { form: { key: recorded_ip, secret: config.post_secret } },
           function (error, response, body) {
               if (!error && response.statusCode == 200) {
-                  console.log(body)
+                console.log('success posting ip');
+                console.log(body)
               } else if (error) {
                 console.log("post-ing exploded somehow ERROR: " + error);
               }
