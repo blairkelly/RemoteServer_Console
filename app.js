@@ -162,7 +162,9 @@ var get_my_ip = function () {
                 if (error) {
                   console.log("post-ing exploded somehow ERROR: " + error); 
                 }
-                console.log('success posting ip');
+                if (response.statusCode == 200) {
+                  console.log('success posting ip');
+                }
                 console.log(body)
                 getting_ip = false;
                 setTimeout(function () {
