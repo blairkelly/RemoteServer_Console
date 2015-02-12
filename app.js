@@ -152,7 +152,7 @@ var get_my_ip = function () {
       var recorded_ip = clean_ip_string(chunk);
       request.post(
           post_ip_form_location,
-          { form: { key: recorded_ip } },
+          { form: { key: recorded_ip, secret: config.post_secret } },
           function (error, response, body) {
               if (!error && response.statusCode == 200) {
                   console.log(body)
