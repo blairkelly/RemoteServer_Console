@@ -159,12 +159,11 @@ var get_my_ip = function () {
             post_ip_form_location,
             { form: { key: recorded_ip, secret: config.post_secret } },
             function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  console.log('success posting ip');
-                  console.log(body)
-                } else if (error) {
-                  console.log("post-ing exploded somehow ERROR: " + error);
+                if (error) {
+                  console.log("post-ing exploded somehow ERROR: " + error); 
                 }
+                console.log('success posting ip');
+                console.log(body)
                 getting_ip = false;
                 setTimeout(function () {
                   get_my_ip();
