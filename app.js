@@ -1,9 +1,10 @@
-console.log(' ');
-console.log(' ');
-console.log('Remote Server Console. Starting...');
-
 var config = require('./private_config');
 var http = require('http');
+var moment = require('moment');
+
+console.log(' ');
+console.log(' ');
+console.log('Remote Server Console. Starting... ' + moment().format('MMMM Do YYYY, h:mm:ss a'));
 
 var request = require('request');
 
@@ -76,7 +77,6 @@ if(!config.remoteserial) {
   });
   myPort.on("open", function () {
     var message = null;
-    get_my_ip();
     myPort.on('data', function (data) {
       var pairs = data.split('&');
       var pieces = null;
@@ -88,8 +88,7 @@ if(!config.remoteserial) {
       //io_local.sockets.emit('serialData', data);
       io_local.sockets.emit('serialParams', params);
       if(params.rhb) {
-        sendserialcommand("h1");
-        get_my_ip();
+            sendserialcommand("h1");
       }
       if(params.computerpowerstate) {
         if(computerpowerstate != params.computerpowerstate) {
@@ -139,16 +138,13 @@ var get_ip_options = {
   port: config.get_ip_port,
   path: config.get_ip_path
 };
-var current_ip = '';
-var checkdelay = 240000;
-var original_checkdelay = checkdelay;
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
 //console.log('post_ip_form_location: ' + post_ip_form_location);
 
-
+var current_ip = '';
 var getting_ip = false;
-var sip = "ip not set";
+var checktime = moment();
 var get_my_ip = function () {
   if (!getting_ip) {
     getting_ip = true;
@@ -157,7 +153,7 @@ var get_my_ip = function () {
       res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
             if (current_ip != recorded_ip) {
-                console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
+                console.log("New IP: " + recorded_ip);
                 request.post(
                     post_ip_form_location,
                     { form: { key: recorded_ip, secret: config.post_secret } },
@@ -172,9 +168,6 @@ var get_my_ip = function () {
                         current_ip = recorded_ip;
                         getting_ip = false;
                         checkdelay = original_checkdelay;
-                        setTimeout(function () {
-                            get_my_ip();
-                        }, checkdelay)
                         console.log("done post");
                     }
                 );
@@ -182,10 +175,6 @@ var get_my_ip = function () {
             else {
                 console.log("IP was the same. No need to update.")
                 getting_ip = false;
-                checkdelay+=10000;
-                setTimeout(function () {
-                    get_my_ip();
-                }, checkdelay)
             }
       });
     }).on('error', function(e) {
@@ -193,6 +182,20 @@ var get_my_ip = function () {
     });
   }
 }
+
+setInterval(function () {
+    //is it time to check again?
+    if (checktime.isAfter()) {
+        //checktime is after now, so do nothing
+        console.log('not yet');
+    }
+    else {
+        //checktime is before now.
+        //set new checktime
+        console.log('now!!');
+        checktime = moment().add(1, 'm');
+    }
+}, 5555);
 
 
 // Emit welcome message on connection
@@ -256,7 +259,7 @@ function compile_css(css_file, docallback) {
 
 
 if(config.remoteserial) {
-  get_my_ip();
+    
 }
 
 
@@ -308,12 +311,10 @@ app.get('/styles/style.css', function (request, response) {
     fs.readFile(cssinfofile, function(err, data) {
       var oldmtime_raw = new Date(data);
       var oldmtime = oldmtime_raw.getTime();
-      console.log('oldmtime: ' + oldmtime);
       fs.stat(css_scss_file_path, function (err, stats) {
         var newmtime_raw = new Date(stats.mtime);
         var newmtime = newmtime_raw.getTime();
         if(oldmtime != newmtime) {
-          console.log('oldmtime ('+oldmtime+') and newmtime ('+newmtime+') do not match.');
           wf(cssinfofile, stats.mtime, function () {
             //does not match
             console.log("Recompiling CSS...");
@@ -326,7 +327,6 @@ app.get('/styles/style.css', function (request, response) {
           });
         } else {
           //has not changed.
-          console.log('Times match. Sending old compiled.css');
           response.sendfile(compiled_css_path);
         }
       });
@@ -335,7 +335,7 @@ app.get('/styles/style.css', function (request, response) {
   fs.exists(cssinfofile, function (exists) {
     if(exists) {
       //don't bother creating the file first, it already exists
-      console.log('FILE ALREADY EXISTS');
+      //console.log('FILE ALREADY EXISTS');
       getstatswritemtime();
     } else {
       wf(cssinfofile, 'newlycreated', function () {
