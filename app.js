@@ -141,6 +141,7 @@ var get_ip_options = {
   path: config.get_ip_path
 };
 var current_ip = '';
+var checkdelay = 240000;
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
 console.log('post_ip_form_location: ' + post_ip_form_location);
@@ -156,6 +157,7 @@ var get_my_ip = function () {
       res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
             if (current_ip != recorded_ip) {
+                current_ip = recorded_ip;
                 console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
                 request.post(
                     post_ip_form_location,
@@ -171,13 +173,16 @@ var get_my_ip = function () {
                         getting_ip = false;
                         setTimeout(function () {
                             get_my_ip();
-                        }, 240000)
+                        }, checkdelay)
                         console.log("done post");
                     }
                 );
             }
             else {
                 console.log("IP was the same. No need to update.")
+                setTimeout(function () {
+                    get_my_ip();
+                }, checkdelay)
             }
       });
     }).on('error', function(e) {
