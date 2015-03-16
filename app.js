@@ -28,23 +28,23 @@ var computerpowerstate_recentlychanged = false;
 var recorded_json_location = __dirname + '/public/recorded.json';
 var saved_data = {}
 rf(recorded_json_location, function (data) {
-  if(data.length > 0) {
-    saved_data = JSON.parse(data);
-  } else {
-    console.log("nothing in saved data file");
-  }  
-  if(!saved_data.max_clients_ever) {
-    saved_data.max_clients_ever = 0;
-    wj(recorded_json_location, saved_data);
-  }
+    if(data.length > 0) {
+        saved_data = JSON.parse(data);
+    } else {
+        console.log("nothing in saved data file");
+    }  
+    if(!saved_data.max_clients_ever) {
+        saved_data.max_clients_ever = 0;
+        wj(recorded_json_location, saved_data);
+    }
 });
 
 
 
 
 var view_data = {
-  cps: "off",
-  pbenabled: "enabled"
+    cps: "off",
+    pbenabled: "enabled"
 }
 
 console.log(' ');
@@ -140,6 +140,7 @@ var get_ip_options = {
   port: config.get_ip_port,
   path: config.get_ip_path
 };
+var current_ip = '';
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
 console.log('post_ip_form_location: ' + post_ip_form_location);
@@ -153,27 +154,31 @@ var get_my_ip = function () {
     console.log("Getting ip...");
     http.get(get_ip_options, function(res) {
       res.on("data", function(chunk) {
-        var recorded_ip = clean_ip_string(chunk);
-        console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
-        request.post(
-            post_ip_form_location,
-            { form: { key: recorded_ip, secret: config.post_secret } },
-            function (error, response, body) {
-                if (error) {
-                  console.log("post-ing exploded somehow ERROR: " + error); 
-                }
-                if (response.statusCode == 200) {
-                  console.log('success posting ip');
-                }
-                console.log(body)
-                getting_ip = false;
-                setTimeout(function () {
-                  get_my_ip();
-                }, 240000)
-                console.log("done post");
+            var recorded_ip = clean_ip_string(chunk);
+            if (current_ip != recorded_ip) {
+                console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
+                request.post(
+                    post_ip_form_location,
+                    { form: { key: recorded_ip, secret: config.post_secret } },
+                    function (error, response, body) {
+                        if (error) {
+                            console.log("post-ing exploded somehow ERROR: " + error); 
+                        }
+                        if (response.statusCode == 200) {
+                            console.log('success posting ip');
+                        }
+                        console.log(body);
+                        getting_ip = false;
+                        setTimeout(function () {
+                            get_my_ip();
+                        }, 240000)
+                        console.log("done post");
+                    }
+                );
             }
-        );
-
+            else {
+                console.log("IP was the same. No need to update.")
+            }
       });
     }).on('error', function(e) {
         console.log("get_recorded_ip_options ERROR: " + e.message);
