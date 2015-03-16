@@ -129,7 +129,6 @@ var clean_ip_string = function (this_ip) {
   //var ip_regex_pattern = "/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).‌​(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.t‌​est('10.10.10.10')";
   //var cleaned_ip = String(this_ip).match(ip_regex_pattern);  //why isn't this working?
   var cleaned_ip = String(this_ip);
-  console.log('cleaned ip: ' + cleaned_ip);
   return cleaned_ip;
 }
 
@@ -144,7 +143,7 @@ var current_ip = '';
 var checkdelay = 240000;
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
-console.log('post_ip_form_location: ' + post_ip_form_location);
+//console.log('post_ip_form_location: ' + post_ip_form_location);
 
 
 var getting_ip = false;
@@ -157,7 +156,6 @@ var get_my_ip = function () {
       res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
             if (current_ip != recorded_ip) {
-                current_ip = recorded_ip;
                 console.log("Cleaned ip received in get_my_ip: " + recorded_ip);
                 request.post(
                     post_ip_form_location,
@@ -170,6 +168,7 @@ var get_my_ip = function () {
                             console.log('success posting ip');
                         }
                         console.log(body);
+                        current_ip = recorded_ip;
                         getting_ip = false;
                         setTimeout(function () {
                             get_my_ip();
