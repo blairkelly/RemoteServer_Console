@@ -141,6 +141,7 @@ var get_ip_options = {
 };
 var current_ip = '';
 var checkdelay = 240000;
+var original_checkdelay = checkdelay;
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
 //console.log('post_ip_form_location: ' + post_ip_form_location);
@@ -170,6 +171,7 @@ var get_my_ip = function () {
                         console.log(body);
                         current_ip = recorded_ip;
                         getting_ip = false;
+                        checkdelay = original_checkdelay;
                         setTimeout(function () {
                             get_my_ip();
                         }, checkdelay)
@@ -179,6 +181,8 @@ var get_my_ip = function () {
             }
             else {
                 console.log("IP was the same. No need to update.")
+                getting_ip = false;
+                checkdelay+=10000;
                 setTimeout(function () {
                     get_my_ip();
                 }, checkdelay)
