@@ -4,7 +4,6 @@ console.log('Remote Server Console. Starting...');
 
 var config = require('./private_config');
 var http = require('http');
-var moment = require('moment');
 
 var request = require('request');
 
@@ -152,7 +151,7 @@ var sip = "ip not set";
 var get_my_ip = function () {
   if (!getting_ip) {
     getting_ip = true;
-    console.log("Getting ip... " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+    console.log("Getting ip... " + new Date());
     http.get(get_ip_options, function(res) {
       res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
