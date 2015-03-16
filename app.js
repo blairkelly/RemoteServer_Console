@@ -145,10 +145,12 @@ var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_
 var current_ip = '';
 var getting_ip = false;
 var checktime = moment();
+var checkdelay = 300; //seconds
+var original_checkdelay = checkdelay;
 var get_my_ip = function () {
   if (!getting_ip) {
     getting_ip = true;
-    console.log("Getting ip... " + new Date());
+    console.log("Getting ip... " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     http.get(get_ip_options, function(res) {
       res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
@@ -168,13 +170,16 @@ var get_my_ip = function () {
                         current_ip = recorded_ip;
                         getting_ip = false;
                         checkdelay = original_checkdelay;
-                        console.log("done post");
+                        console.log(checkdelay + ": done post");
+                        checktime = moment().add(checkdelay, 's');  //set next checktime
                     }
                 );
             }
             else {
-                console.log("IP was the same. No need to update.")
                 getting_ip = false;
+                checkdelay+=10;
+                console.log(checkdelay + ": No need to update.");
+                checktime = moment().add(checkdelay, 's');  //set next checktime
             }
       });
     }).on('error', function(e) {
@@ -187,15 +192,13 @@ setInterval(function () {
     //is it time to check again?
     if (checktime.isAfter()) {
         //checktime is after now, so do nothing
-        console.log('not yet');
     }
     else {
         //checktime is before now.
-        //set new checktime
-        console.log('now!!');
-        checktime = moment().add(1, 'm');
+        get_my_ip();
     }
-}, 5555);
+}, 30000);
+get_my_ip();
 
 
 // Emit welcome message on connection
@@ -290,7 +293,8 @@ app.get('/', function (request, response) {
       }).on('error', function(e) {
           console.log("get server ip ERROR: " + e.message);
       });
-  } else {
+  }
+  else {
     view_data.cps = computerpowerstate;
     respond();    
   }
