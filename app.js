@@ -157,16 +157,15 @@ var get_my_ip = function () {
     console.log("Getting ip... " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     http.get(get_ip_options, function(res) {
         res.on("data", function(chunk) {
-            var recorded_ip = clean_ip_string(chunk);
-
+            var newly_checked_ip = clean_ip_string(chunk);
             http.get(get_oldip_options, function (oldip_res) {
                 oldip_res.on("data", function(oldip_chunk) {
                     var current_ip = clean_ip_string(oldip_chunk);
-                    if (current_ip != recorded_ip) {
-                        console.log("New IP: " + recorded_ip);
+                    if (current_ip != newly_checked_ip) {
+                        console.log("Old IP: " + current_ip + "   New IP: " + newly_checked_ip);
                         request.post(
                             post_ip_form_location,
-                            { form: { key: recorded_ip, secret: config.post_secret } },
+                            { form: { key: newly_checked_ip, secret: config.post_secret } },
                             function (error, response, body) {
                                 if (error) {
                                     console.log("post-ing exploded somehow ERROR: " + error); 
@@ -193,7 +192,7 @@ var get_my_ip = function () {
             });
         });
     }).on('error', function(e) {
-        console.log("get_recorded_ip_options ERROR: " + e.message);
+        console.log("get_newly_checked_ip_options ERROR: " + e.message);
     });
   }
 }
