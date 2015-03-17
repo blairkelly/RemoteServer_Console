@@ -138,11 +138,15 @@ var get_ip_options = {
   port: config.get_ip_port,
   path: config.get_ip_path
 };
+var get_oldip_options = {
+  host: config.get_oldip_host,
+  port: config.get_oldip_port,
+  path: config.get_oldip_path
+};
 //post options
 var post_ip_form_location = 'http://' + config.post_ip_host + ':' + config.post_ip_port + config.post_ip_path;
 //console.log('post_ip_form_location: ' + post_ip_form_location);
 
-var current_ip = '';
 var getting_ip = false;
 var checktime = moment();
 var checkdelay = 300; //seconds
@@ -152,36 +156,42 @@ var get_my_ip = function () {
     getting_ip = true;
     console.log("Getting ip... " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     http.get(get_ip_options, function(res) {
-      res.on("data", function(chunk) {
+        res.on("data", function(chunk) {
             var recorded_ip = clean_ip_string(chunk);
-            if (current_ip != recorded_ip) {
-                console.log("New IP: " + recorded_ip);
-                request.post(
-                    post_ip_form_location,
-                    { form: { key: recorded_ip, secret: config.post_secret } },
-                    function (error, response, body) {
-                        if (error) {
-                            console.log("post-ing exploded somehow ERROR: " + error); 
-                        }
-                        if (response.statusCode == 200) {
-                            console.log('success posting ip');
-                        }
-                        console.log(body);
-                        current_ip = recorded_ip;
+
+            http.get(get_oldip_options, function (oldip_res) {
+                oldip_res.on("data", function(oldip_chunk) {
+                    var current_ip = clean_ip_string(oldip_chunk);
+                    if (current_ip != recorded_ip) {
+                        console.log("New IP: " + recorded_ip);
+                        request.post(
+                            post_ip_form_location,
+                            { form: { key: recorded_ip, secret: config.post_secret } },
+                            function (error, response, body) {
+                                if (error) {
+                                    console.log("post-ing exploded somehow ERROR: " + error); 
+                                }
+                                if (response.statusCode == 200) {
+                                    console.log('success posting ip');
+                                }
+                                console.log(body);
+                                getting_ip = false;
+                                checkdelay = original_checkdelay;
+                                console.log(checkdelay + ": done post");
+                                checktime = moment().add(checkdelay, 's');  //set next checktime
+                            }
+                        );
+                    }
+                    else {
                         getting_ip = false;
-                        checkdelay = original_checkdelay;
-                        console.log(checkdelay + ": done post");
+                        checkdelay+=20;
+                        console.log(checkdelay + ": No need to update.");
                         checktime = moment().add(checkdelay, 's');  //set next checktime
                     }
-                );
-            }
-            else {
-                getting_ip = false;
-                checkdelay+=10;
-                console.log(checkdelay + ": No need to update.");
-                checktime = moment().add(checkdelay, 's');  //set next checktime
-            }
-      });
+
+                });
+            });
+        });
     }).on('error', function(e) {
         console.log("get_recorded_ip_options ERROR: " + e.message);
     });
@@ -197,7 +207,7 @@ setInterval(function () {
         //checktime is before now.
         get_my_ip();
     }
-}, 30000);
+}, 5000);
 get_my_ip();
 
 
